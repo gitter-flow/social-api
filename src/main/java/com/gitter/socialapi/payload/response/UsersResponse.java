@@ -1,23 +1,24 @@
 package com.gitter.socialapi.payload.response;
 
 import com.gitter.socialapi.model.UserEntity;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@NoArgsConstructor
 public class UsersResponse {
-    private  Long id;
+    Long id;
 
-    private String firstName;
+     String firstName;
 
-    private String lastName;
+     String lastName;
 
-    private String email;
+     String email;
 
-    private String password;
+     String password;
 
-    private List<UserEntity> follower = new ArrayList<>();
+     List<UserEntity> follower = new ArrayList<>();
 
-    private List<UserEntity> follow = new ArrayList<>();
+     List<UserEntity> follow = new ArrayList<>();
 
 }
