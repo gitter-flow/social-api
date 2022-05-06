@@ -1,0 +1,77 @@
+version: 2.1
+
+parameters:
+  pull_request:
+    type: boolean
+    default: false
+    
+orbs:
+  security-report: dreamquark-ai/security-report@1.0.1
+
+executors:
+  security-report: dreamquark-ai/security-report@1.0.1
+
+jobs:
+  build-and-test:
+    docker:
+      - image: maven:3.6.3-openjdk-17-slim@sha256:ead687c670f30898fc28e6c7b9dab652360d522b8912ba96eca0f08592a73eec
+    steps:
+      - checkout
+      - run:
+          name: Build
+          command: |
+            mvn clean install -DskipTests
+      - run:
+          name: Test
+          command: echo "Not implemented yet."
+
+  docker-security:
+    executor: security-report/default
+    working_directory: /root/app
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: false
+          version: 20.10.11
+      - run:
+          name: "Build & pull the images for security report"
+          command: |
+            echo $QUAY_PASSWORD | docker login -u $QUAY_LOGIN --password-stdin quay.io
+            docker pull quay.io/gitter/social-network-api:1.0.0
+            make build-docker IMAGE_TAG=security-test
+      - security-report/security-report:
+          image: 'quay.io/gitter/social-network-api'
+          base-tag: '1.0.0'
+          new-tag: 'security-test'
+          orga: 'gitter-flow'
+          repo: 'social-api'
+          topic: 'social-api-security-report'
+
+  build-docker:
+    docker:
+      - image: quay.io/paulbarrie7/docker:latest
+    working_directory: /root/app
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: false
+          version: 20.10.11
+      - run:
+          name: "Build the image"
+          command: |
+            make build-docker
+
+workflows:
+  test:
+    when: << pipeline.parameters.pull_request >>
+    jobs:
+      - build-and-test:
+            context:
+              - ci-gitter
+      - docker-security:
+            context:
+              - ci-gitter
+  build-docker:
+    when: << pipeline.parameters.pull_request >>
+    jobs:
+      - build-docker
