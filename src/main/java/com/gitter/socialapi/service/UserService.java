@@ -1,6 +1,6 @@
 package com.gitter.socialapi.service;
 
-import com.gitter.socialapi.payload.request.UserRequest;
+import com.gitter.socialapi.payload.request.UserCreationRequest;
 import com.gitter.socialapi.payload.response.UsersResponse;
 import com.gitter.socialapi.mapper.UserMapper;
 import com.gitter.socialapi.model.UserEntity;
@@ -12,7 +12,6 @@ import java.util.List;
 
 
 @Service
-@Component
 public class UserService {
 
     private final UserRepository userRepository;
@@ -29,12 +28,9 @@ public class UserService {
         List<UsersResponse> usersResponse = userMapper.mapUsersToUsersResponse(users);
         return usersResponse;
     }
-    public void addUsers(UserRequest userDto){
-        UserEntity userEntity = userMapper.mapUserDtoToUser(userDto);
+    public void addUsers(UserCreationRequest userCreationRequest){
+        UserEntity userEntity = userMapper.mapUserDtoToUser(userCreationRequest);
         userRepository.save(userEntity);
     }
-
-
-
 
 }

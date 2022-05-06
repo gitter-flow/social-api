@@ -1,11 +1,9 @@
 package com.gitter.socialapi.mapper;
 
-import com.gitter.socialapi.payload.request.UserRequest;
+import com.gitter.socialapi.payload.request.UserCreationRequest;
 import com.gitter.socialapi.payload.response.UsersResponse;
 import com.gitter.socialapi.model.UserEntity;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -26,7 +24,7 @@ public class UserMapper {
                 .collect(Collectors.toList());
        return usersResponse;
     }
-    public UserEntity mapUserDtoToUser(UserRequest user){
+    public UserEntity mapUserDtoToUser(UserCreationRequest user){
         UserEntity userEntity = modelMapper.map(user,UserEntity.class);
         return userEntity;
     }

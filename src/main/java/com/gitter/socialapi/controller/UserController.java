@@ -1,6 +1,6 @@
 package com.gitter.socialapi.controller;
 
-import com.gitter.socialapi.payload.request.UserRequest;
+import com.gitter.socialapi.payload.request.UserCreationRequest;
 import com.gitter.socialapi.payload.response.UsersResponse;
 import com.gitter.socialapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class UserController {
     }
 
     @PostMapping("/add")
-    void addUsers(@RequestBody UserRequest userRequest) {
-         userService.addUsers(userRequest);
+    void addUsers(@RequestBody UserCreationRequest userCreationRequest) {
+         userService.addUsers(userCreationRequest);
     }
 }

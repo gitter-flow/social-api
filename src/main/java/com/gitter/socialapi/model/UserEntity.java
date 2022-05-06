@@ -1,40 +1,33 @@
 package com.gitter.socialapi.model;
 
 import lombok.AllArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.neo4j.core.schema.GeneratedValue;
-import org.springframework.data.neo4j.core.schema.Node;
-import org.springframework.data.neo4j.core.schema.Property;
-import org.springframework.data.neo4j.core.schema.Relationship;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
-@Node("User")
+@Entity(name="user")
 public class UserEntity {
-
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Property("firstName")
-    private String firstName;
+    private Long keycloakId;
+    private String username;
 
-    @Property("lastName")
-    private String lastName;
-
-    @Property("email")
-    private String email;
-
-    @Property("password")
-    private String password;
-
-    @Relationship(type = "DIRECTED", direction = Relationship.Direction.INCOMING)
+    @OneToMany(fetch = FetchType.LAZY)
     private List<UserEntity> follower = new ArrayList<>();
 
-    @Relationship(type = "DIRECTED", direction = Relationship.Direction.INCOMING)
-    private List<UserEntity> follow = new ArrayList<>();
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<UserEntity> followed = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<PublicationEntity> publications = new ArrayList<>();
 
 }
