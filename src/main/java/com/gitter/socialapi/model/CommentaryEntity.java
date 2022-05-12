@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,6 +24,16 @@ public class CommentaryEntity {
     private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="commentary_id")
+    @JoinColumn(name="publication_id")
     private PublicationEntity publication ;
+
+    private String content;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="reactions_id")
+    private ReactionEntity reaction ;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
+    private List<UserEntity> likedBy = new ArrayList<>();
 }

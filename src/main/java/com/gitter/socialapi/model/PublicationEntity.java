@@ -21,9 +21,11 @@ public class PublicationEntity {
     private UserEntity user;
 
     @Nullable
-    private Long previous_publication_id;
+    private Long previousPublicationId;
+
     @Nullable
     private Long type_code_id;
+
     private String code;
 
 

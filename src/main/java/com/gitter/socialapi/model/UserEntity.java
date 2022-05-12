@@ -22,10 +22,10 @@ public class UserEntity {
     private String username;
 
     @OneToMany(fetch = FetchType.LAZY)
-    private List<UserEntity> follower = new ArrayList<>();
+    private List<UserEntity> follows = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY)
-    private List<UserEntity> followed = new ArrayList<>();
+    private List<UserEntity> followedBy = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY)
     private List<PublicationEntity> publications = new ArrayList<>();

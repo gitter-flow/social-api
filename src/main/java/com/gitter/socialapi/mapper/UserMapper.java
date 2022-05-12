@@ -1,7 +1,7 @@
 package com.gitter.socialapi.mapper;
 
 import com.gitter.socialapi.payload.request.UserCreationRequest;
-import com.gitter.socialapi.payload.response.UsersResponse;
+import com.gitter.socialapi.payload.response.UserReponse;
 import com.gitter.socialapi.model.UserEntity;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -18,11 +18,11 @@ public class UserMapper {
     }
 
 
-    public List<UsersResponse> mapUsersToUsersResponse(List<UserEntity> users){
-        List<UsersResponse>usersResponse = users.stream()
-                .map(user -> modelMapper.map(user, UsersResponse.class))
+    public List<UserReponse> mapUsersToUsersResponse(List<UserEntity> users){
+        List<UserReponse> userReponse = users.stream()
+                .map(user -> modelMapper.map(user, UserReponse.class))
                 .collect(Collectors.toList());
-       return usersResponse;
+       return userReponse;
     }
     public UserEntity mapUserDtoToUser(UserCreationRequest user){
         UserEntity userEntity = modelMapper.map(user,UserEntity.class);

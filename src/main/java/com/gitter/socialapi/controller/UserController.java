@@ -1,7 +1,7 @@
 package com.gitter.socialapi.controller;
 
 import com.gitter.socialapi.payload.request.UserCreationRequest;
-import com.gitter.socialapi.payload.response.UsersResponse;
+import com.gitter.socialapi.payload.response.UserReponse;
 import com.gitter.socialapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +24,7 @@ public class UserController {
 
 
     @GetMapping("/users")
-    List<UsersResponse> getAllUsers() {
+    List<UserReponse> getAllUsers() {
         return userService.getAllUsers();
     }
 
