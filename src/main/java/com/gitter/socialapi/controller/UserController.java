@@ -1,35 +1,44 @@
 package com.gitter.socialapi.controller;
 
-import com.gitter.socialapi.payload.request.UserCreationRequest;
-import com.gitter.socialapi.payload.response.UserReponse;
+import com.gitter.socialapi.model.PublicationEntity;
+import com.gitter.socialapi.model.UserEntity;
+import com.gitter.socialapi.service.PublicationService;
 import com.gitter.socialapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @RestController
+@RequestMapping( value = "/user")
 public class UserController {
 
-    private final UserService userService;
+    private UserService userService;
 
     @Autowired
-    public UserController(UserService userService) {
+    UserController(UserService userService) {
         this.userService = userService;
     }
 
+    @PostMapping("/add")
+    public void saveUser(@RequestBody UserEntity user){
+        userService.addUser(user);
+    }
 
     @GetMapping("/users")
-    List<UserReponse> getAllUsers() {
-        return userService.getAllUsers();
+    List<UserEntity> all() {
+        return userService.getUsers();
     }
 
-    @PostMapping("/add")
-    void addUsers(@RequestBody UserCreationRequest userCreationRequest) {
-         userService.addUsers(userCreationRequest);
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable Long id){
+        userService.deleteUser(id);
     }
+
+
+
+
+
+
+
 }

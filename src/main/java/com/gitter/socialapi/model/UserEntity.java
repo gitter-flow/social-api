@@ -19,6 +19,7 @@ public class UserEntity {
     private Long id;
 
     private Long keycloakId;
+
     private String username;
 
     @OneToMany(fetch = FetchType.LAZY)

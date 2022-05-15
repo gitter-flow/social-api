@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,6 +29,10 @@ public class PublicationEntity {
     private Long type_code_id;
 
     private String code;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
+    private List<UserEntity> likedBy;
 
 
 }

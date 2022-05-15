@@ -5,21 +5,23 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "typeCode")
-public class TypeCodeEntity {
+@Entity(name = "code")
+public class CodeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    private String label;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="publication_id")
+    private PublicationEntity publication;
 
-    private String apiCodeMod;
+    private String bucket;
 
-    private String apiRoute;
-
+    private TypeCode typeCode;
 
 }

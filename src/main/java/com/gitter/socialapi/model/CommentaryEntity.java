@@ -29,10 +29,6 @@ public class CommentaryEntity {
 
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="reactions_id")
-    private ReactionEntity reaction ;
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     private List<UserEntity> likedBy = new ArrayList<>();
