@@ -21,7 +21,8 @@ public class CodeEntity {
     private PublicationEntity publication;
 
     private String bucket;
-
+    
+    // Set annotation
     private TypeCode typeCode;
 
 }

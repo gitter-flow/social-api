@@ -13,7 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @Entity(name = "commentary")
 public class CommentaryEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
@@ -25,7 +24,7 @@ public class CommentaryEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="publication_id")
-    private PublicationEntity publication ;
+    private PublicationEntity publication;
 
     private String content;
 

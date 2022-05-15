@@ -7,6 +7,4 @@ public enum TypeCode {
     JAVA,
     PYTHON,
     JAVASCRIPT
-
-
 }

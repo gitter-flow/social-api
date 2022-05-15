@@ -19,20 +19,17 @@ public class PublicationEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="commentary_id")
+    @JoinColumn(name="user_id")
     private UserEntity user;
 
     @Nullable
-    private Long previousPublicationId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private PublicationEntity publicationEntity;
 
-    @Nullable
-    private Long type_code_id;
-
-    private String code;
+    @OneToOne(fetch = FetchType.LAZY)
+    private CodeEntity code;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     private List<UserEntity> likedBy;
-
-
 }

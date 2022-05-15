@@ -31,4 +31,7 @@ public class UserEntity {
     @OneToMany(fetch = FetchType.LAZY)
     private List<PublicationEntity> publications = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<PublicationEntity> likedPublications = new ArrayList<>();
+
 }
