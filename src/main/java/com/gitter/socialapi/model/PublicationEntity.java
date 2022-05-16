@@ -26,7 +26,12 @@ public class PublicationEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private PublicationEntity publicationEntity;
 
+    private String content;
+
+    private Boolean disable;
+
     @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="code_id")
     private CodeEntity code;
 
     @ManyToMany(fetch = FetchType.LAZY)

@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name="user")
+@Entity(name="users")
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -21,6 +21,7 @@ public class UserEntity {
     private Long keycloakId;
 
     private String username;
+
 
     @OneToMany(fetch = FetchType.LAZY)
     private List<UserEntity> follows = new ArrayList<>();
