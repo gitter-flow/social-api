@@ -2,7 +2,7 @@ package com.gitter.socialapi.service;
 import com.gitter.socialapi.model.CodeEntity;
 import com.gitter.socialapi.model.PublicationEntity;
 import com.gitter.socialapi.model.UserEntity;
-import com.gitter.socialapi.payload.request.CreateContentPublicationRequest;
+import com.gitter.socialapi.payload.request.CreatePublicationRequest;
 import com.gitter.socialapi.payload.request.EditContentPublicationRequest;
 import com.gitter.socialapi.payload.request.EditLikePublicationRequest;
 import com.gitter.socialapi.repository.CodeRepository;
@@ -30,7 +30,7 @@ public class PublicationService {
     }
 
 
-    public void addPublication(CreateContentPublicationRequest createContentPublicationRequest){
+    public void addPublication(CreatePublicationRequest createContentPublicationRequest){
         PublicationEntity publicationEntity = new PublicationEntity();
         Optional<UserEntity> userFound = userRepository.findById(Long.valueOf(createContentPublicationRequest.getUserId()));
         Optional<PublicationEntity> publicationFound = publicationRepository.findById(Long.valueOf(createContentPublicationRequest.getPublicationId()));

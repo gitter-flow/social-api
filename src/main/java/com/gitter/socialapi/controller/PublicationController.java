@@ -1,11 +1,9 @@
 package com.gitter.socialapi.controller;
 
-import com.gitter.socialapi.model.CommentaryEntity;
 import com.gitter.socialapi.model.PublicationEntity;
-import com.gitter.socialapi.payload.request.CreateContentPublicationRequest;
+import com.gitter.socialapi.payload.request.CreatePublicationRequest;
 import com.gitter.socialapi.payload.request.EditContentPublicationRequest;
 import com.gitter.socialapi.payload.request.EditLikePublicationRequest;
-import com.gitter.socialapi.service.CommentaryService;
 import com.gitter.socialapi.service.PublicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +22,8 @@ public class PublicationController {
     }
 
     @PostMapping
-    public void savePublication(@RequestBody CreateContentPublicationRequest createContentPublicationRequest){
-        publicationService.addPublication(createContentPublicationRequest);
+    public void savePublication(@RequestBody CreatePublicationRequest createPublicationRequest){
+        publicationService.addPublication(createPublicationRequest);
     }
     @PutMapping
     public void editPublication(@RequestBody EditContentPublicationRequest contentPublicationRequest){

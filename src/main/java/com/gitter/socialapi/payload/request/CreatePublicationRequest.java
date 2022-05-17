@@ -5,7 +5,7 @@ import org.springframework.lang.Nullable;
 
 import java.util.List;
 @Getter
-public class CreateContentPublicationRequest {
+public class CreatePublicationRequest {
 
     private String userId;
 
