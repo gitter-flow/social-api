@@ -10,4 +10,6 @@ import java.util.List;
 public interface CommentaryRepository extends JpaRepository<CommentaryEntity, Long> {
 
     List<CommentaryEntity> findAll();
+
+    List<CommentaryEntity> getCommentaryEntitiesByPublication_Id (Long id);
 }

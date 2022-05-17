@@ -1,6 +1,7 @@
 package com.gitter.socialapi.controller;
 
 import com.gitter.socialapi.model.CodeEntity;
+import com.gitter.socialapi.payload.request.CodeCreationRequest;
 import com.gitter.socialapi.service.CodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ public class CodeController {
     }
 
     @PostMapping("/add")
-    public void saveCode(@RequestBody CodeEntity code){
+    public void saveCode(@RequestBody CodeCreationRequest code){
          codeService.addCode(code);
     }
 

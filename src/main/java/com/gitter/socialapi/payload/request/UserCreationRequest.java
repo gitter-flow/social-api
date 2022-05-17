@@ -4,4 +4,5 @@ public class UserCreationRequest {
      private String keycloakId;
      private String username;
 
+
 }

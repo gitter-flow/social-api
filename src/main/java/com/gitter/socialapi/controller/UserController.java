@@ -2,6 +2,7 @@ package com.gitter.socialapi.controller;
 
 import com.gitter.socialapi.model.PublicationEntity;
 import com.gitter.socialapi.model.UserEntity;
+import com.gitter.socialapi.payload.request.EditFollowUserRequest;
 import com.gitter.socialapi.service.PublicationService;
 import com.gitter.socialapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,15 @@ public class UserController {
         userService.deleteUser(id);
     }
 
+    @PostMapping("/follow")
+    public void follow(@RequestBody EditFollowUserRequest editFollowUserRequest){
+        userService.follow(editFollowUserRequest);
+    }
 
+    @PostMapping("/unfollow")
+    public void unfollow(@RequestBody EditFollowUserRequest editFollowUserRequest){
+        userService.unfollow(editFollowUserRequest);
+    }
 
 
 

@@ -21,8 +21,9 @@ public class CodeEntity {
     private PublicationEntity publication;
 
     private String bucket;
-    
-    // Set annotation
+
+    @Enumerated(EnumType.STRING)
+    @Column(name="typeCode")
     private TypeCode typeCode;
 
 }
