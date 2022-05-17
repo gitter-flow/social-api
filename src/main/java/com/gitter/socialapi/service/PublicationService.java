@@ -33,14 +33,18 @@ public class PublicationService {
     public void addPublication(CreatePublicationRequest createContentPublicationRequest){
         PublicationEntity publicationEntity = new PublicationEntity();
         Optional<UserEntity> userFound = userRepository.findById(Long.valueOf(createContentPublicationRequest.getUserId()));
-        Optional<PublicationEntity> publicationFound = publicationRepository.findById(Long.valueOf(createContentPublicationRequest.getPublicationId()));
-        Optional<CodeEntity> codeFound = codeRepository.findById(Long.valueOf(createContentPublicationRequest.getCodeId()));
         publicationEntity.setUser(userFound.get());
-        publicationEntity.setPublicationEntity(publicationFound.get());
+        
+        if(createContentPublicationRequest.getPublicationId() != null) {
+            Optional<PublicationEntity> publicationFound = publicationRepository.findById(Long.valueOf(createContentPublicationRequest.getPublicationId()));
+            publicationEntity.setPublicationEntity(publicationFound.get());
+        }
+        if(createContentPublicationRequest.getCodeId() != null) {
+            Optional<CodeEntity> codeFound = codeRepository.findById(Long.valueOf(createContentPublicationRequest.getCodeId()));
+            publicationEntity.setCode(codeFound.get());
+        }
         publicationEntity.setContent(createContentPublicationRequest.getContent());
         publicationEntity.setDisable(false);
-        publicationEntity.setCode(codeFound.get());
-        publicationEntity.setLikedBy(createContentPublicationRequest.getLikedBy());
         publicationRepository.save(publicationEntity);
     }
 
@@ -51,7 +55,7 @@ public class PublicationService {
 
     public void updatePublication(PublicationEntity publication){
         Optional<PublicationEntity> publicationFound = publicationRepository.findById(publication.getId());
-        if(publicationFound.get().getDisable()==true){
+        if(publicationFound.get().getDisable()){
             throw new NullPointerException("Publication disable");
         }
         if (publicationFound.isPresent()) {

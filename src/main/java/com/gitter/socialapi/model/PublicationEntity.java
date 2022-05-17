@@ -32,6 +32,7 @@ public class PublicationEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="code_id")
+    @Nullable
     private CodeEntity code;
 
     @ManyToMany(fetch = FetchType.LAZY)

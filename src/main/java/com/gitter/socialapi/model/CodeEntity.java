@@ -3,6 +3,7 @@ package com.gitter.socialapi.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
@@ -25,4 +26,15 @@ public class CodeEntity {
     @Enumerated(EnumType.STRING)
     private TypeCode typeCode;
 
+    public void setPublication(PublicationEntity publication) {
+        this.publication = publication;
+    }
+
+    public void setBucket(String bucket) {
+        this.bucket = bucket;
+    }
+
+    public void setTypeCode(TypeCode typeCode) {
+        this.typeCode = typeCode;
+    }
 }
