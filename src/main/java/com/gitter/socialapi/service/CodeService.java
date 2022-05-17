@@ -29,7 +29,7 @@ public class CodeService {
     public void addCode(CodeCreationRequest codeDto){
         CodeEntity code = new CodeEntity();
         code.setPublication(publicationRepository.getById(Long.valueOf(codeDto.getPublication())));
-        code.setBucket(code.getBucket());
+        code.setBucket(codeDto.getBucket());
         TypeCode typeCode = TypeCode.valueOf(codeDto.getTypeCode());
         if(typeCode==null){
             throw new IllegalStateException("The typeCode does not exist");

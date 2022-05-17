@@ -2,6 +2,7 @@ package com.gitter.socialapi.controller;
 
 import com.gitter.socialapi.model.CommentaryEntity;
 import com.gitter.socialapi.model.PublicationEntity;
+import com.gitter.socialapi.payload.request.CreateContentPublicationRequest;
 import com.gitter.socialapi.payload.request.EditContentPublicationRequest;
 import com.gitter.socialapi.payload.request.EditLikePublicationRequest;
 import com.gitter.socialapi.service.CommentaryService;
@@ -23,8 +24,8 @@ public class PublicationController {
     }
 
     @PostMapping
-    public void savePublication(@RequestBody PublicationEntity publication){
-        publicationService.addPublication(publication);
+    public void savePublication(@RequestBody CreateContentPublicationRequest createContentPublicationRequest){
+        publicationService.addPublication(createContentPublicationRequest);
     }
     @PutMapping
     public void editPublication(@RequestBody EditContentPublicationRequest contentPublicationRequest){

@@ -20,7 +20,8 @@ public class CodeController {
 
     @PostMapping("/add")
     public void saveCode(@RequestBody CodeCreationRequest code){
-         codeService.addCode(code);
+
+        codeService.addCode(code);
     }
 
     @GetMapping("/codes")

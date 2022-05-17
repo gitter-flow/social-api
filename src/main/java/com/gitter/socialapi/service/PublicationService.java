@@ -1,8 +1,11 @@
 package com.gitter.socialapi.service;
+import com.gitter.socialapi.model.CodeEntity;
 import com.gitter.socialapi.model.PublicationEntity;
 import com.gitter.socialapi.model.UserEntity;
+import com.gitter.socialapi.payload.request.CreateContentPublicationRequest;
 import com.gitter.socialapi.payload.request.EditContentPublicationRequest;
 import com.gitter.socialapi.payload.request.EditLikePublicationRequest;
+import com.gitter.socialapi.repository.CodeRepository;
 import com.gitter.socialapi.repository.PublicationRepository;
 import com.gitter.socialapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,17 +20,28 @@ public class PublicationService {
 
     private final PublicationRepository publicationRepository;
     private final UserRepository userRepository;
+    private final CodeRepository codeRepository;
 
     @Autowired
-    public PublicationService(PublicationRepository publicationRepository, UserRepository userRepository) {
+    public PublicationService(PublicationRepository publicationRepository, UserRepository userRepository, CodeRepository codeRepository) {
         this.publicationRepository = publicationRepository;
         this.userRepository = userRepository;
+        this.codeRepository = codeRepository;
     }
 
 
-    public void addPublication(PublicationEntity publication){
-        publication.setDisable(false);
-        publicationRepository.save(publication);
+    public void addPublication(CreateContentPublicationRequest createContentPublicationRequest){
+        PublicationEntity publicationEntity = new PublicationEntity();
+        Optional<UserEntity> userFound = userRepository.findById(Long.valueOf(createContentPublicationRequest.getUserId()));
+        Optional<PublicationEntity> publicationFound = publicationRepository.findById(Long.valueOf(createContentPublicationRequest.getPublicationId()));
+        Optional<CodeEntity> codeFound = codeRepository.findById(Long.valueOf(createContentPublicationRequest.getCodeId()));
+        publicationEntity.setUser(userFound.get());
+        publicationEntity.setPublicationEntity(publicationFound.get());
+        publicationEntity.setContent(createContentPublicationRequest.getContent());
+        publicationEntity.setDisable(false);
+        publicationEntity.setCode(codeFound.get());
+        publicationEntity.setLikedBy(createContentPublicationRequest.getLikedBy());
+        publicationRepository.save(publicationEntity);
     }
 
     public List<PublicationEntity> getPublications(){

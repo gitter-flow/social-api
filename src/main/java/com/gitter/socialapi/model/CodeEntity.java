@@ -23,7 +23,6 @@ public class CodeEntity {
     private String bucket;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="typeCode")
     private TypeCode typeCode;
 
 }
