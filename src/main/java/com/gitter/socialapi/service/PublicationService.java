@@ -33,6 +33,9 @@ public class PublicationService {
     public void addPublication(CreatePublicationRequest createContentPublicationRequest){
         PublicationEntity publicationEntity = new PublicationEntity();
         Optional<UserEntity> userFound = userRepository.findById(Long.valueOf(createContentPublicationRequest.getUserId()));
+        if(userFound.isEmpty()){
+            throw new NullPointerException("User not found");
+        }
         publicationEntity.setUser(userFound.get());
         
         if(createContentPublicationRequest.getPublicationId() != null) {

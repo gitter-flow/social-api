@@ -6,10 +6,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Setter
 @Entity(name = "code")
 public class CodeEntity {
     @Id
@@ -26,15 +29,8 @@ public class CodeEntity {
     @Enumerated(EnumType.STRING)
     private TypeCode typeCode;
 
-    public void setPublication(PublicationEntity publication) {
-        this.publication = publication;
-    }
-
-    public void setBucket(String bucket) {
-        this.bucket = bucket;
-    }
-
-    public void setTypeCode(TypeCode typeCode) {
-        this.typeCode = typeCode;
-    }
+    @ElementCollection
+    @CollectionTable(name="code_versions", joinColumns=@JoinColumn(name="code_id"))
+    @Column(name="version")
+    public List<String> versions =  new ArrayList<>();
 }

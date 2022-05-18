@@ -1,14 +1,15 @@
 package com.gitter.socialapi.service;
 import com.gitter.socialapi.model.CodeEntity;
 import com.gitter.socialapi.model.TypeCode;
-import com.gitter.socialapi.payload.request.CodeCreationRequest;
+import com.gitter.socialapi.payload.request.CreationCodeRequest;
+import com.gitter.socialapi.payload.request.AddVersionCodeRequest;
 import com.gitter.socialapi.payload.request.EditCodeRequest;
+import com.gitter.socialapi.payload.request.GetVersionCodeRequest;
 import com.gitter.socialapi.repository.CodeRepository;
 import com.gitter.socialapi.repository.PublicationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.LinkOption;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +27,7 @@ public class CodeService {
     }
 
 
-    public void addCode(CodeCreationRequest codeDto){
+    public void addCode(CreationCodeRequest codeDto){
         CodeEntity code = new CodeEntity();
         code.setPublication(publicationRepository.getById(Long.valueOf(codeDto.getPublication())));
         code.setBucket(codeDto.getBucket());
@@ -36,9 +37,24 @@ public class CodeService {
         }
 
         code.setTypeCode(typeCode);
+        List<String> versions = code.getVersions();
+        versions.add(0,codeDto.getVersion());
+        code.setVersions(versions);
         codeRepository.save(code);
     }
 
+    public void addVersion(AddVersionCodeRequest addVersionCodeRequest){
+        Optional<CodeEntity> codeFound = codeRepository.findById(Long.valueOf(addVersionCodeRequest.getId()));
+        List<String> versions = codeFound.get().getVersions();
+        versions.add(0, addVersionCodeRequest.getVersion());
+        codeFound.get().setVersions(versions);
+        codeRepository.save(codeFound.get());
+    }
+
+    public List<String> getVersions(GetVersionCodeRequest getVersionCodeRequest){
+        CodeEntity code = codeRepository.getById(Long.valueOf(getVersionCodeRequest.getId()));
+        return code.getVersions();
+    }
     public List<CodeEntity> getCodes(){
         return codeRepository.findAll();
     }
