@@ -45,6 +45,9 @@ public class CodeService {
 
     public void addVersion(AddVersionCodeRequest addVersionCodeRequest){
         Optional<CodeEntity> codeFound = codeRepository.findById(Long.valueOf(addVersionCodeRequest.getId()));
+        if(codeFound.isEmpty()){
+            throw new NullPointerException("Code not found");
+        }
         List<String> versions = codeFound.get().getVersions();
         versions.add(0, addVersionCodeRequest.getVersion());
         codeFound.get().setVersions(versions);
@@ -52,8 +55,11 @@ public class CodeService {
     }
 
     public List<String> getVersions(GetVersionCodeRequest getVersionCodeRequest){
-        CodeEntity code = codeRepository.getById(Long.valueOf(getVersionCodeRequest.getId()));
-        return code.getVersions();
+        Optional<CodeEntity> codeFound = codeRepository.findById(Long.valueOf(getVersionCodeRequest.getId()));
+        if(codeFound.isEmpty()){
+            throw new NullPointerException("Code not found");
+        }
+        return codeFound.get().getVersions();
     }
     public List<CodeEntity> getCodes(){
         return codeRepository.findAll();
