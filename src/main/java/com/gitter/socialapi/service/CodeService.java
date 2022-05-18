@@ -59,6 +59,7 @@ public class CodeService {
         if(codeFound.isEmpty()){
             throw new NullPointerException("Code not found");
         }
+
         return codeFound.get().getVersions();
     }
     public List<CodeEntity> getCodes(){
