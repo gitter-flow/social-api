@@ -4,6 +4,7 @@ import com.gitter.socialapi.model.CodeEntity;
 import com.gitter.socialapi.payload.request.AddVersionCodeRequest;
 import com.gitter.socialapi.payload.request.CreationCodeRequest;
 import com.gitter.socialapi.payload.request.GetVersionCodeRequest;
+import com.gitter.socialapi.payload.response.AddVersionCodeResponse;
 import com.gitter.socialapi.service.CodeService;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +31,8 @@ public class CodeController {
     }
 
     @PutMapping
-    public void addVersion(@RequestBody AddVersionCodeRequest addVersionCodeRequest){
-        codeService.addVersion(addVersionCodeRequest);
+    public AddVersionCodeResponse addVersion(@RequestBody AddVersionCodeRequest addVersionCodeRequest){
+        return codeService.addVersion(addVersionCodeRequest);
     }
     @GetMapping("version")
     public List<String> getVersion(@RequestBody GetVersionCodeRequest getVersionCodeRequest)

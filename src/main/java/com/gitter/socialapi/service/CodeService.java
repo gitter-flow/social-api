@@ -5,6 +5,7 @@ import com.gitter.socialapi.payload.request.CreationCodeRequest;
 import com.gitter.socialapi.payload.request.AddVersionCodeRequest;
 import com.gitter.socialapi.payload.request.EditCodeRequest;
 import com.gitter.socialapi.payload.request.GetVersionCodeRequest;
+import com.gitter.socialapi.payload.response.AddVersionCodeResponse;
 import com.gitter.socialapi.repository.CodeRepository;
 import com.gitter.socialapi.repository.PublicationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ public class CodeService {
         codeRepository.save(code);
     }
 
-    public void addVersion(AddVersionCodeRequest addVersionCodeRequest){
+    public AddVersionCodeResponse addVersion(AddVersionCodeRequest addVersionCodeRequest){
         Optional<CodeEntity> codeFound = codeRepository.findById(Long.valueOf(addVersionCodeRequest.getId()));
         if(codeFound.isEmpty()){
             throw new NullPointerException("Code not found");
@@ -52,6 +53,8 @@ public class CodeService {
         versions.add(0, addVersionCodeRequest.getVersion());
         codeFound.get().setVersions(versions);
         codeRepository.save(codeFound.get());
+         AddVersionCodeResponse addVersionCodeResponse = new AddVersionCodeResponse(codeFound.get().getId().toString());
+        return addVersionCodeResponse;
     }
 
     public List<String> getVersions(GetVersionCodeRequest getVersionCodeRequest){
