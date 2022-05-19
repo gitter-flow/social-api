@@ -1,8 +1,10 @@
-package com.gitter.socialapi.publication;
+package com.gitter.socialapi.publication.exposition;
 
-import com.gitter.socialapi.publication.payload.request.CreatePublicationRequest;
-import com.gitter.socialapi.publication.payload.request.EditContentPublicationRequest;
-import com.gitter.socialapi.publication.payload.request.EditLikePublicationRequest;
+import com.gitter.socialapi.publication.domain.PublicationEntity;
+import com.gitter.socialapi.publication.application.PublicationService;
+import com.gitter.socialapi.publication.exposition.payload.request.CreatePublicationRequest;
+import com.gitter.socialapi.publication.exposition.payload.request.EditContentPublicationRequest;
+import com.gitter.socialapi.publication.exposition.payload.request.EditLikePublicationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

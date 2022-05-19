@@ -1,7 +1,7 @@
-package com.gitter.socialapi.comment;
+package com.gitter.socialapi.comment.domain;
 
-import com.gitter.socialapi.publication.PublicationEntity;
-import com.gitter.socialapi.user.UserEntity;
+import com.gitter.socialapi.publication.domain.PublicationEntity;
+import com.gitter.socialapi.user.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "commentary")
+@Entity(name = "comment")
 public class CommentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,7 +22,7 @@ public class CommentEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
-    private UserEntity user;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="publication_id")
@@ -32,5 +32,5 @@ public class CommentEntity {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
-    private List<UserEntity> likedBy = new ArrayList<>();
+    private List<User> likedBy = new ArrayList<>();
 }

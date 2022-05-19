@@ -1,11 +1,11 @@
-package com.gitter.socialapi.comment;
+package com.gitter.socialapi.comment.application;
 import com.gitter.socialapi.comment.domain.CommentEntity;
 import com.gitter.socialapi.comment.infrastructure.CommentRepository;
-import com.gitter.socialapi.user.UserEntity;
+import com.gitter.socialapi.user.domain.User;
 import com.gitter.socialapi.comment.exposition.payload.request.UpdateCommentRequest;
-import com.gitter.socialapi.comment.exposition.payload.request.EditLikeCommentaryRequest;
+import com.gitter.socialapi.comment.exposition.payload.request.LikeCommentRequest;
 import com.gitter.socialapi.comment.exposition.payload.request.GetCommentRequest;
-import com.gitter.socialapi.user.UserRepository;
+import com.gitter.socialapi.user.infrastructure.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,58 +16,58 @@ import java.util.Optional;
 @Service
 public class CommentService {
 
-    private final CommentRepository commentaryRepository;
+    private final CommentRepository commentRepository;
     private final UserRepository userRepository;
 
     @Autowired
-    public CommentService(CommentRepository commentaryRepository, UserRepository userRepository) {
-        this.commentaryRepository = commentaryRepository;
+    public CommentService(CommentRepository commentRepository, UserRepository userRepository) {
+        this.commentRepository = commentRepository;
         this.userRepository = userRepository;
     }
 
 
-    public Long addCommentary(CommentEntity commentaryEntity){
-        commentaryRepository.save(commentaryEntity);
-        return commentaryEntity.getId();
+    public Long addComment(CommentEntity commentEntity){
+        commentRepository.save(commentEntity);
+        return commentEntity.getId();
     }
 
-    public List<CommentEntity> getCommentarys(){
-        return commentaryRepository.findAll();
+    public List<CommentEntity> getComments(){
+        return commentRepository.findAll();
     }
 
-    public void updateCommentary(CommentEntity commentary){
-        Optional<CommentEntity> commentaryFound = commentaryRepository.findById(commentary.getId());
-        if (commentaryFound.isPresent()) {
-            commentaryFound.get().setContent(commentary.getContent());
-            commentaryFound.get().setPublication(commentary.getPublication());
-            commentaryFound.get().setUser(commentary.getUser());
-            List<UserEntity> usersLiked = commentaryFound.get().getLikedBy();
-            commentary.getLikedBy().forEach(user -> usersLiked.add(user));
-            commentaryFound.get().setLikedBy(usersLiked);
+    public void updateComment(CommentEntity comment){
+        Optional<CommentEntity> commentFound = commentRepository.findById(comment.getId());
+        if (commentFound.isPresent()) {
+            commentFound.get().setContent(comment.getContent());
+            commentFound.get().setPublication(comment.getPublication());
+            commentFound.get().setUser(comment.getUser());
+            List<User> usersLiked = commentFound.get().getLikedBy();
+            comment.getLikedBy().forEach(user -> usersLiked.add(user));
+            commentFound.get().setLikedBy(usersLiked);
         }
         else {
             throw new NullPointerException("Code not found");
         }
     }
 
-    public void deleteCommentary(Long id){
-        Optional<CommentEntity> commentaryFound = commentaryRepository.findById(id);
-        if(commentaryFound.isPresent()){
-            commentaryRepository.delete(commentaryFound.get());
+    public void deleteComment(Long id){
+        Optional<CommentEntity> commentFound = commentRepository.findById(id);
+        if(commentFound.isPresent()){
+            commentRepository.delete(commentFound.get());
         }
         else {
             throw new NullPointerException("Code not found");
         }
     }
 
-    public void likeCommentary(EditLikeCommentaryRequest editLikeCommentaryRequest) {
-        Optional<CommentEntity> commentaryFound = commentaryRepository.findById(Long.parseLong(editLikeCommentaryRequest.getCommentaryId()));
-        if (commentaryFound.isPresent()) {
-            List<UserEntity> likedBy = commentaryFound.get().getLikedBy();
-            Optional<UserEntity> userFound = userRepository.findById(Long.parseLong(editLikeCommentaryRequest.getUserId()));
+    public void likeComment(LikeCommentRequest editLikeCommentRequest) {
+        Optional<CommentEntity> commentFound = commentRepository.findById(Long.parseLong(editLikeCommentRequest.getCommentId()));
+        if (commentFound.isPresent()) {
+            List<User> likedBy = commentFound.get().getLikedBy();
+            Optional<User> userFound = userRepository.findById(Long.parseLong(editLikeCommentRequest.getUserId()));
             if(userFound.isPresent()){
                 likedBy.add(userFound.get());
-                commentaryRepository.save(commentaryFound.get());
+                commentRepository.save(commentFound.get());
             }else {
                 throw new NullPointerException("User not found");
             }
@@ -77,14 +77,14 @@ public class CommentService {
         }
     }
 
-    public void unlikeCommentary(EditLikeCommentaryRequest editLikeCommentaryRequest) {
-        Optional<CommentEntity> commentaryFound = commentaryRepository.findById(Long.parseLong(editLikeCommentaryRequest.getCommentaryId()));
-        if (commentaryFound.isPresent()) {
-            List<UserEntity> likedBy = commentaryFound.get().getLikedBy();
-            Optional<UserEntity> userFound = userRepository.findById(Long.parseLong(editLikeCommentaryRequest.getUserId()));
+    public void unlikeComment(LikeCommentRequest editLikeCommentRequest) {
+        Optional<CommentEntity> commentFound = commentRepository.findById(Long.parseLong(editLikeCommentRequest.getCommentId()));
+        if (commentFound.isPresent()) {
+            List<User> likedBy = commentFound.get().getLikedBy();
+            Optional<User> userFound = userRepository.findById(Long.parseLong(editLikeCommentRequest.getUserId()));
             if(userFound.isPresent()){
                 likedBy.remove(userFound.get());
-                commentaryRepository.save(commentaryFound.get());
+                commentRepository.save(commentFound.get());
             }else {
                 throw new NullPointerException("User not found");
             }
@@ -94,11 +94,11 @@ public class CommentService {
         }
     }
 
-    public void updateContentCommentary(UpdateCommentRequest contentCommentaryRequest) {
-        Optional<CommentEntity> commentaryFound = commentaryRepository.findById(Long.parseLong(contentCommentaryRequest.getId()));
-        if (commentaryFound.isPresent()) {
-            commentaryFound.get().setContent(contentCommentaryRequest.getContent());
-            commentaryRepository.save(commentaryFound.get());
+    public void updateContentComment(UpdateCommentRequest contentCommentRequest) {
+        Optional<CommentEntity> commentFound = commentRepository.findById(Long.parseLong(contentCommentRequest.getId()));
+        if (commentFound.isPresent()) {
+            commentFound.get().setContent(contentCommentRequest.getContent());
+            commentRepository.save(commentFound.get());
         }
         else {
             throw new NullPointerException("Publication not found");
@@ -106,7 +106,7 @@ public class CommentService {
     }
 
 
-    public  List<CommentEntity> getCommentaryPublication(GetCommentRequest getCommentaryPublicationRequest) {
-        return commentaryRepository.getCommentaryEntitiesByPublication_Id(Long.valueOf(getCommentaryPublicationRequest.getPublicationId()));
+    public  List<CommentEntity> getCommentPublication(GetCommentRequest getCommentPublicationRequest) {
+        return commentRepository.getCommentEntitiesByPublication_Id(Long.valueOf(getCommentPublicationRequest.getPublicationId()));
     }
 }

@@ -1,7 +1,7 @@
-package com.gitter.socialapi.code;
+package com.gitter.socialapi.code.domain;
 
-import com.gitter.socialapi.publication.PublicationEntity;
-import com.gitter.socialapi.publication.TypeCode;
+import com.gitter.socialapi.publication.domain.PublicationEntity;
+import com.gitter.socialapi.publication.domain.TypeCode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,6 @@
-package com.gitter.socialapi.code;
+package com.gitter.socialapi.code.infrastructure;
 
-import com.gitter.socialapi.code.CodeEntity;
+import com.gitter.socialapi.code.domain.CodeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

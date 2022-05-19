@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
 
 @SpringBootApplication
-public class SocialApiApplication {
+public class SocialApiApplication { 
     public static void main(String[] args) {
         SpringApplication.run(SocialApiApplication.class, args);
     }

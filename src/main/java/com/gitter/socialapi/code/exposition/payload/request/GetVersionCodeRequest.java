@@ -1,4 +1,4 @@
-package com.gitter.socialapi.code.payload.request;
+package com.gitter.socialapi.code.exposition.payload.request;
 
 import lombok.Getter;
 

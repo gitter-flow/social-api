@@ -1,13 +1,13 @@
-package com.gitter.socialapi.code;
+package com.gitter.socialapi.code.application;
 import com.gitter.socialapi.code.domain.CodeEntity;
 import com.gitter.socialapi.code.infrastructure.CodeRepository;
-import com.gitter.socialapi.publication.TypeCode;
+import com.gitter.socialapi.publication.domain.TypeCode;
 import com.gitter.socialapi.code.exposition.payload.request.CreationCodeRequest;
 import com.gitter.socialapi.code.exposition.payload.request.AddVersionCodeRequest;
 import com.gitter.socialapi.code.exposition.payload.request.EditCodeRequest;
 import com.gitter.socialapi.code.exposition.payload.request.GetVersionCodeRequest;
 import com.gitter.socialapi.code.exposition.payload.response.AddVersionCodeResponse;
-import com.gitter.socialapi.publication.PublicationRepository;
+import com.gitter.socialapi.publication.infrastructure.PublicationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

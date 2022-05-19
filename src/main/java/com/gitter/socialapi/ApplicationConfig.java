@@ -1,4 +1,4 @@
-package com.gitter.socialapi.config;
+package com.gitter.socialapi;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

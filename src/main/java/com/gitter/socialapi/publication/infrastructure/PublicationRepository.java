@@ -1,6 +1,6 @@
-package com.gitter.socialapi.publication;
+package com.gitter.socialapi.publication.infrastructure;
 
-import com.gitter.socialapi.publication.PublicationEntity;
+import com.gitter.socialapi.publication.domain.PublicationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

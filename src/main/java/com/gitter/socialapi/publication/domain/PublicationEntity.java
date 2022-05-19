@@ -1,7 +1,7 @@
-package com.gitter.socialapi.publication;
+package com.gitter.socialapi.publication.domain;
 
 import com.gitter.socialapi.code.domain.CodeEntity;
-import com.gitter.socialapi.user.UserEntity;
+import com.gitter.socialapi.user.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,7 +22,7 @@ public class PublicationEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
-    private UserEntity user;
+    private User user;
 
     @Nullable
     @ManyToOne(fetch = FetchType.LAZY)
@@ -39,5 +39,5 @@ public class PublicationEntity {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
-    private List<UserEntity> likedBy;
+    private List<User> likedBy;
 }

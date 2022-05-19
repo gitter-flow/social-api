@@ -1,11 +1,13 @@
-package com.gitter.socialapi.publication;
+package com.gitter.socialapi.publication.application;
 import com.gitter.socialapi.code.domain.CodeEntity;
-import com.gitter.socialapi.user.UserEntity;
-import com.gitter.socialapi.publication.payload.request.CreatePublicationRequest;
-import com.gitter.socialapi.publication.payload.request.EditContentPublicationRequest;
-import com.gitter.socialapi.publication.payload.request.EditLikePublicationRequest;
+import com.gitter.socialapi.publication.domain.PublicationEntity;
+import com.gitter.socialapi.publication.infrastructure.PublicationRepository;
+import com.gitter.socialapi.user.domain.User;
+import com.gitter.socialapi.publication.exposition.payload.request.CreatePublicationRequest;
+import com.gitter.socialapi.publication.exposition.payload.request.EditContentPublicationRequest;
+import com.gitter.socialapi.publication.exposition.payload.request.EditLikePublicationRequest;
 import com.gitter.socialapi.code.infrastructure.CodeRepository;
-import com.gitter.socialapi.user.UserRepository;
+import com.gitter.socialapi.user.infrastructure.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +32,7 @@ public class PublicationService {
 
     public Long addPublication(CreatePublicationRequest createContentPublicationRequest){
         PublicationEntity publicationEntity = new PublicationEntity();
-        Optional<UserEntity> userFound = userRepository.findById(Long.valueOf(createContentPublicationRequest.getUserId()));
+        Optional<User> userFound = userRepository.findById(Long.valueOf(createContentPublicationRequest.getUserId()));
         if(userFound.isEmpty()){
             throw new NullPointerException("User not found");
         }
@@ -65,7 +67,7 @@ public class PublicationService {
             publicationFound.get().setPublicationEntity(publication.getPublicationEntity());
             publicationFound.get().setContent(publication.getContent());
             publicationFound.get().setCode(publication.getCode());
-            List<UserEntity> usersLiked = publicationFound.get().getLikedBy();
+            List<User> usersLiked = publicationFound.get().getLikedBy();
             usersLiked.forEach(user -> usersLiked.add(user));
             publicationFound.get().setLikedBy(usersLiked);
         }
@@ -99,8 +101,8 @@ public class PublicationService {
     public void likePublication(EditLikePublicationRequest editLikePublicationRequest) {
         Optional<PublicationEntity> publicationFound = publicationRepository.findById(Long.parseLong(editLikePublicationRequest.getPublicationId()));
         if (publicationFound.isPresent()) {
-            List<UserEntity> likedBy = publicationFound.get().getLikedBy();
-            Optional<UserEntity> userFound = userRepository.findById(Long.parseLong(editLikePublicationRequest.getUserId()));
+            List<User> likedBy = publicationFound.get().getLikedBy();
+            Optional<User> userFound = userRepository.findById(Long.parseLong(editLikePublicationRequest.getUserId()));
             if(userFound.isPresent()){
                 likedBy.add(userFound.get());
                 publicationRepository.save(publicationFound.get());
@@ -116,8 +118,8 @@ public class PublicationService {
     public void unlikePublication(EditLikePublicationRequest editLikePublicationRequest) {
         Optional<PublicationEntity> publicationFound = publicationRepository.findById(Long.parseLong(editLikePublicationRequest.getPublicationId()));
         if (publicationFound.isPresent()) {
-            List<UserEntity> likedBy = publicationFound.get().getLikedBy();
-            Optional<UserEntity> userFound = userRepository.findById(Long.parseLong(editLikePublicationRequest.getUserId()));
+            List<User> likedBy = publicationFound.get().getLikedBy();
+            Optional<User> userFound = userRepository.findById(Long.parseLong(editLikePublicationRequest.getUserId()));
             if(userFound.isPresent()){
                 likedBy.remove(userFound.get());
                 publicationRepository.save(publicationFound.get());
