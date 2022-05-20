@@ -1,17 +1,20 @@
 package com.gitter.socialapi.publication.application;
-import com.gitter.socialapi.code.domain.CodeEntity;
-import com.gitter.socialapi.publication.domain.PublicationEntity;
+
+import com.gitter.socialapi.code.application.CodeService;
+import com.gitter.socialapi.code.domain.Code;
+import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
+import com.gitter.socialapi.kernel.exceptions.NoSuchEntityException;
+import com.gitter.socialapi.publication.domain.Publication;
+import com.gitter.socialapi.publication.exposition.payload.request.*;
+import com.gitter.socialapi.publication.exposition.payload.response.CreatePublicationResponse;
+import com.gitter.socialapi.publication.exposition.payload.response.GetPublicationResponse;
 import com.gitter.socialapi.publication.infrastructure.PublicationRepository;
+import com.gitter.socialapi.user.application.UserService;
 import com.gitter.socialapi.user.domain.User;
-import com.gitter.socialapi.publication.exposition.payload.request.CreatePublicationRequest;
-import com.gitter.socialapi.publication.exposition.payload.request.EditContentPublicationRequest;
-import com.gitter.socialapi.publication.exposition.payload.request.EditLikePublicationRequest;
-import com.gitter.socialapi.code.infrastructure.CodeRepository;
-import com.gitter.socialapi.user.infrastructure.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 
@@ -19,116 +22,91 @@ import java.util.Optional;
 public class PublicationService {
 
     private final PublicationRepository publicationRepository;
-    private final UserRepository userRepository;
-    private final CodeRepository codeRepository;
+    private final UserService userService;
+    private final CodeService codeService;
+    
+    private final String baseURL;
 
     @Autowired
-    public PublicationService(PublicationRepository publicationRepository, UserRepository userRepository, CodeRepository codeRepository) {
+    public PublicationService(PublicationRepository publicationRepository,
+                              UserService userService, 
+                              CodeService codeService,
+                              @Value("${application.url}") String baseURL
+                              ) {
         this.publicationRepository = publicationRepository;
-        this.userRepository = userRepository;
-        this.codeRepository = codeRepository;
+        this.userService = userService;
+        this.codeService = codeService;
+        this.baseURL = baseURL;
+    }
+    
+    public Publication getPublicationFromIdString(String idStr) throws InvalidParameterException {
+        long id;
+        try {
+            id = Long.parseLong(idStr);
+        } catch (NumberFormatException nfe) {
+            throw InvalidParameterException.forField("id", idStr);
+        }
+        Optional<Publication> publication = publicationRepository.findById(id);
+
+        if(publication.isEmpty()){
+            throw NoSuchEntityException.withId(Publication.class.getSimpleName(), id);
+        }
+        return publication.get();
     }
 
+    public CreatePublicationResponse createPublication(CreatePublicationRequest publicationRequest) throws InvalidParameterException {
+        Publication publication = new Publication();
+        publication.setUser(userService.getUserFromStringId(publicationRequest.getUserId()));
 
-    public Long addPublication(CreatePublicationRequest createContentPublicationRequest){
-        PublicationEntity publicationEntity = new PublicationEntity();
-        Optional<User> userFound = userRepository.findById(Long.valueOf(createContentPublicationRequest.getUserId()));
-        if(userFound.isEmpty()){
-            throw new NullPointerException("User not found");
+        if(publicationRequest.getSharedPublicationId() != null) {
+            publication.setSharedPublication(getPublicationFromIdString(publicationRequest.getSharedPublicationId()));
+            publicationRepository.save(publication);
+            return CreatePublicationMapper.toResponse(publication);
+        } else if(publicationRequest.getParentPublicationId() != null) {
+            publication.setParentPublication(getPublicationFromIdString(publicationRequest.getParentPublicationId()));
         }
-        publicationEntity.setUser(userFound.get());
+        if(publicationRequest.getCodeId() != null) {
+            publication.setCode(codeService.getCodeFromIdString(publicationRequest.getCodeId()));
+        }
+        if(publicationRequest.getContent() != null) {
+            publication.setContent(publicationRequest.getContent());
+        }
+        publicationRepository.save(publication);
         
-        if(createContentPublicationRequest.getPublicationId() != null) {
-            Optional<PublicationEntity> publicationFound = publicationRepository.findById(Long.valueOf(createContentPublicationRequest.getPublicationId()));
-            publicationEntity.setPublicationEntity(publicationFound.get());
-        }
-        if(createContentPublicationRequest.getCodeId() != null) {
-            Optional<CodeEntity> codeFound = codeRepository.findById(Long.valueOf(createContentPublicationRequest.getCodeId()));
-            publicationEntity.setCode(codeFound.get());
-        }
-        publicationEntity.setContent(createContentPublicationRequest.getContent());
-        publicationEntity.setDisable(false);
-        publicationRepository.save(publicationEntity);
-        
-        return publicationEntity.getId();
+        return CreatePublicationMapper.toResponse(publication);
     }
-
-    public List<PublicationEntity> getPublications(){
-        return publicationRepository.findAll();
+    
+    public GetPublicationResponse getPublicationByID(String id) throws InvalidParameterException {
+        Publication publication = getPublicationFromIdString(id);
+        GetPublicationMapper mapper = new GetPublicationMapper(baseURL);
+        return mapper.toResponse(publication);
     }
-
-    public void updatePublication(PublicationEntity publication){
-        Optional<PublicationEntity> publicationFound = publicationRepository.findById(publication.getId());
-        if(publicationFound.get().getDisable()){
-            throw new NullPointerException("Publication disable");
+    
+    public void updatePublication(UpdatePublicationRequest updateRequest) throws InvalidParameterException {
+        Publication publication = getPublicationFromIdString(updateRequest.getId());
+        if(updateRequest.getContent() != null) {
+            publication.setContent(updateRequest.getContent());
         }
-        if (publicationFound.isPresent()) {
-            publicationFound.get().setUser(publication.getUser());
-            publicationFound.get().setPublicationEntity(publication.getPublicationEntity());
-            publicationFound.get().setContent(publication.getContent());
-            publicationFound.get().setCode(publication.getCode());
-            List<User> usersLiked = publicationFound.get().getLikedBy();
-            usersLiked.forEach(user -> usersLiked.add(user));
-            publicationFound.get().setLikedBy(usersLiked);
+        if(updateRequest.getCodeId() != null) {
+            Code code = codeService.getCodeFromIdString(updateRequest.getCodeId());
+            publication.setCode(code);
         }
-        else {
-            throw new NullPointerException("Publication not found");
-        }
+        publicationRepository.save(publication);
     }
-
-    public void deletePublication(Long id){
-        Optional<PublicationEntity> publicationFound = publicationRepository.findById(id);
-        if(publicationFound.isPresent()){
-            publicationFound.get().setDisable(true);
-            publicationRepository.save(publicationFound.get());
-        }
-        else {
-            throw new NullPointerException("Publication not found");
-        }
+    public void likePublication(UpdateLikePublicationRequest likePublicationRequest) throws InvalidParameterException {
+        Publication publication = getPublicationFromIdString(likePublicationRequest.getPublicationId());
+        User user = userService.getUserFromStringId(likePublicationRequest.getUserId());
+        publication.getLikedBy().add(user);
+        publicationRepository.save(publication);
     }
-
-    public void updateContentPublication(EditContentPublicationRequest contentPublicationRequest) {
-        Optional<PublicationEntity> publicationFound = publicationRepository.findById(Long.parseLong(contentPublicationRequest.getId()));
-        if (publicationFound.isPresent()) {
-            publicationFound.get().setContent(contentPublicationRequest.getContent());
-            publicationRepository.save(publicationFound.get());
-        }
-        else {
-            throw new NullPointerException("Publication not found");
-        }
+    public void unlikePublication(UpdateUnlikePublicationRequest unlikePublicationRequest) throws InvalidParameterException {
+        Publication publication = getPublicationFromIdString(unlikePublicationRequest.getPublicationId());
+        User user = userService.getUserFromStringId(unlikePublicationRequest.getUserId());
+        publication.getLikedBy().remove(user);
+        publicationRepository.save(publication);
     }
-
-    public void likePublication(EditLikePublicationRequest editLikePublicationRequest) {
-        Optional<PublicationEntity> publicationFound = publicationRepository.findById(Long.parseLong(editLikePublicationRequest.getPublicationId()));
-        if (publicationFound.isPresent()) {
-            List<User> likedBy = publicationFound.get().getLikedBy();
-            Optional<User> userFound = userRepository.findById(Long.parseLong(editLikePublicationRequest.getUserId()));
-            if(userFound.isPresent()){
-                likedBy.add(userFound.get());
-                publicationRepository.save(publicationFound.get());
-            }else {
-                throw new NullPointerException("User not found");
-            }
-        }
-        else {
-            throw new NullPointerException("Publication not found");
-        }
-    }
-
-    public void unlikePublication(EditLikePublicationRequest editLikePublicationRequest) {
-        Optional<PublicationEntity> publicationFound = publicationRepository.findById(Long.parseLong(editLikePublicationRequest.getPublicationId()));
-        if (publicationFound.isPresent()) {
-            List<User> likedBy = publicationFound.get().getLikedBy();
-            Optional<User> userFound = userRepository.findById(Long.parseLong(editLikePublicationRequest.getUserId()));
-            if(userFound.isPresent()){
-                likedBy.remove(userFound.get());
-                publicationRepository.save(publicationFound.get());
-            }else {
-                throw new NullPointerException("User not found");
-            }
-        }
-        else {
-            throw new NullPointerException("Publication not found");
-        }
+    public void deletePublication(DeletePublicationRequest deleteRequest) throws InvalidParameterException {
+        Publication publication = getPublicationFromIdString(deleteRequest.getId());
+        publicationRepository.delete(publication);
     }
 }

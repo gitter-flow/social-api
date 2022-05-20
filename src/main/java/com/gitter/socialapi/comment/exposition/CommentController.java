@@ -19,7 +19,7 @@ public class CommentController {
     CommentController(CommentService commentService) {
         this.commentService = commentService;
     }
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<Long> createComment(@RequestBody CommentEntity comment){
         Long id = commentService.addComment(comment);
         return ResponseEntity.ok(id);
@@ -28,13 +28,14 @@ public class CommentController {
     public ResponseEntity<List<CommentEntity>> getAll() {
         return ResponseEntity.ok(commentService.getComments());
     }
+    
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
         commentService.deleteComment(id);
         return ResponseEntity.ok().build();
     }
     @PutMapping
-    public ResponseEntity<Void> editComment(@RequestBody UpdateCommentRequest contentCommentRequest) {
+    public ResponseEntity<Void> updateComment(@RequestBody UpdateCommentRequest contentCommentRequest) {
         commentService.updateContentComment(contentCommentRequest);
         return ResponseEntity.ok().build();
     }

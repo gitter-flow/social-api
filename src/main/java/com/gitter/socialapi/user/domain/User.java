@@ -1,13 +1,15 @@
 package com.gitter.socialapi.user.domain;
 
-import com.gitter.socialapi.publication.domain.PublicationEntity;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.gitter.socialapi.publication.domain.Publication;
+import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -18,20 +20,17 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
-
+    @Column(name = "keycloak_id", nullable = false, unique = true)
     private String keycloakId;
-
+    
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
-    
     private String firstName;
-    
     private String lastName;
-    
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
-    
     private String description;
-
-    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_follows",
             joinColumns = @JoinColumn( name = "id_user" ),
@@ -39,22 +38,20 @@ public class User {
     )
     private List<User> follows = new ArrayList<>();
     
-    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true)
-    @JoinTable(
-            name = "user_followed_by",
-            joinColumns = @JoinColumn( name = "id_user" ),
-            inverseJoinColumns = @JoinColumn( name = "id_follower" )
-    )
-    private List<User> followedBy = new ArrayList<>();
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "follows")
+    private Set<User> followedBy = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY)
-    private List<PublicationEntity> publications = new ArrayList<>();
+    private Set<Publication> publications = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    private List<PublicationEntity> likedPublications = new ArrayList<>();
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Set<Publication> likedPublications = new HashSet<>();
     
-    public User(String keycloakId, String description, String firstName, String lastName, String email) {
+    public User(String keycloakId, String username, String description, String firstName, String lastName, String email) {
         this.keycloakId = keycloakId;
+        this.username = username;
         this.description = description;
         this.firstName = firstName;
         this.lastName = lastName;

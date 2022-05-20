@@ -1,5 +1,8 @@
 package com.gitter.socialapi.user.exposition.payload.response;
 
+import lombok.Getter;
+
+@Getter
 public class RetrieveUserByIdResponse {
     private Long id;
     private String keycloakId;

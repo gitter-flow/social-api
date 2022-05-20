@@ -6,11 +6,8 @@ import lombok.NonNull;
 public class CreatePublicationRequest {
     @NonNull
     private String userId;
-    
-    private String publicationId;
-    
-    @NonNull
     private String content;
-    
+    private String parentPublicationId;
+    private String sharedPublicationId;
     private String codeId;
 }

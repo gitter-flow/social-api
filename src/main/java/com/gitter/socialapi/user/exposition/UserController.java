@@ -5,13 +5,19 @@ import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.user.application.UserService;
 import com.gitter.socialapi.user.exposition.payload.request.*;
 import com.gitter.socialapi.user.exposition.payload.response.CreateUserResponse;
+import com.gitter.socialapi.user.exposition.payload.response.GetUserPublicationsResponse;
 import com.gitter.socialapi.user.exposition.payload.response.RetrieveUserByIdResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping( value = "/user")
+@RequestMapping( 
+        value = "/user",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
 public class UserController {
 
     private UserService userService;
@@ -25,10 +31,14 @@ public class UserController {
     public ResponseEntity<CreateUserResponse> createUser(@RequestBody CreateUserRequest user){
         return ResponseEntity.ok(userService.createUser(user));
     }
-    @GetMapping
-    public ResponseEntity<RetrieveUserByIdResponse> retrieveUserById(@RequestBody RetrieveUserByIdRequest userRequest){
-        RetrieveUserByIdResponse userResponse = userService.getById(userRequest.getId());
+    @GetMapping("/{id}")
+    public ResponseEntity<RetrieveUserByIdResponse> retrieveUserById(@PathVariable String id) throws InvalidParameterException {
+        RetrieveUserByIdResponse userResponse = userService.getById(id);
         return ResponseEntity.ok(userResponse);
+    }
+    @GetMapping("/publications")
+    public ResponseEntity<GetUserPublicationsResponse> getUserPublications(@RequestBody GetUserPublicationRequest getRequest) throws InvalidParameterException {
+        return ResponseEntity.ok(userService.getUserPublications(getRequest.getId()));
     }
     @PutMapping
     public ResponseEntity<Void> updateUser(@RequestBody UpdateUserRequest updateUserRequest) throws InvalidParameterException {

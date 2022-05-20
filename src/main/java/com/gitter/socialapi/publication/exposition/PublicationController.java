@@ -1,18 +1,22 @@
 package com.gitter.socialapi.publication.exposition;
 
-import com.gitter.socialapi.publication.domain.PublicationEntity;
+import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.publication.application.PublicationService;
-import com.gitter.socialapi.publication.exposition.payload.request.CreatePublicationRequest;
-import com.gitter.socialapi.publication.exposition.payload.request.EditContentPublicationRequest;
-import com.gitter.socialapi.publication.exposition.payload.request.EditLikePublicationRequest;
+import com.gitter.socialapi.publication.domain.Publication;
+import com.gitter.socialapi.publication.exposition.payload.request.*;
+import com.gitter.socialapi.publication.exposition.payload.response.CreatePublicationResponse;
+import com.gitter.socialapi.publication.exposition.payload.response.GetPublicationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping( value = "/publication")
+@RequestMapping(
+        value = "/publication",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+)
 public class PublicationController {
     private PublicationService publicationService;
     @Autowired
@@ -21,31 +25,33 @@ public class PublicationController {
     }
 
     @PostMapping
-    public ResponseEntity<Long> savePublication(@RequestBody CreatePublicationRequest createPublicationRequest){
-        Long publicationId = publicationService.addPublication(createPublicationRequest);
-        return ResponseEntity.ok(publicationId);
+    public ResponseEntity<CreatePublicationResponse> createPublication(@RequestBody CreatePublicationRequest createPublicationRequest) throws InvalidParameterException {
+        CreatePublicationResponse response = publicationService.createPublication(createPublicationRequest);
+        return ResponseEntity.ok(response);
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<GetPublicationResponse> retrievePublicationByID(@PathVariable String id) throws InvalidParameterException {
+        return ResponseEntity.ok(publicationService.getPublicationByID(id));
+    }
+    
     @PutMapping
-    public ResponseEntity<Void> editPublication(@RequestBody EditContentPublicationRequest contentPublicationRequest){
-        publicationService.updateContentPublication(contentPublicationRequest);
+    public ResponseEntity<Void> updatePublication(@RequestBody UpdatePublicationRequest updateRequest) throws InvalidParameterException {
+        publicationService.updatePublication(updateRequest);
         return ResponseEntity.ok().build();
     }
-    @GetMapping("/all")
-    public ResponseEntity<List<PublicationEntity>> all() {
-        return ResponseEntity.ok(publicationService.getPublications());
-    }
-    @PutMapping("/{id}")
-    public void disablePublication(@PathVariable Long id){
-        publicationService.deletePublication(id);
-    }
     @PostMapping("/like")
-    public ResponseEntity<Void> likePublication(@RequestBody EditLikePublicationRequest editLikePublicationRequest){
+    public ResponseEntity<Void> likePublication(@RequestBody UpdateLikePublicationRequest editLikePublicationRequest) throws InvalidParameterException {
         publicationService.likePublication(editLikePublicationRequest);
         return ResponseEntity.ok().build();
     }
     @PostMapping("/unlike")
-    public ResponseEntity<Void> unlikePublication(@RequestBody EditLikePublicationRequest editLikePublicationRequest){
-        publicationService.unlikePublication(editLikePublicationRequest);
+    public ResponseEntity<Void> unlikePublication(@RequestBody UpdateUnlikePublicationRequest updateUnlikePublicationRequest) throws InvalidParameterException {
+        publicationService.unlikePublication(updateUnlikePublicationRequest);
+        return ResponseEntity.ok().build();
+    }
+    @DeleteMapping
+    public ResponseEntity<Void> deletePublication(@RequestBody DeletePublicationRequest deletePublicationRequest) throws InvalidParameterException {
+        publicationService.deletePublication(deletePublicationRequest);
         return ResponseEntity.ok().build();
     }
 }

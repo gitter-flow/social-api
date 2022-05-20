@@ -4,12 +4,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CreationCodeRequest {
+public class CreateCodeRequest {
     private String bucket;
-
-    private String publication;
-
-    private String typeCode;
-
-    private String version;
+    private String publicationId;
+    private String codeType;
 }

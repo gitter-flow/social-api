@@ -1,12 +1,14 @@
 package com.gitter.socialapi.user.application;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.kernel.exceptions.NoSuchEntityException;
+import com.gitter.socialapi.user.exposition.payload.response.GetUserPublicationsResponse;
 import com.gitter.socialapi.user.exposition.payload.request.*;
 import com.gitter.socialapi.user.exposition.payload.response.CreateUserResponse;
 import com.gitter.socialapi.user.infrastructure.UserRepository;
 import com.gitter.socialapi.user.domain.User;
 import com.gitter.socialapi.user.exposition.payload.response.RetrieveUserByIdResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,13 +20,16 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-
+    
+    private final String baseURL;
+    
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, @Value("${application.url}") String baseURL) {
         this.userRepository = userRepository;
+        this.baseURL = baseURL;
     }
 
-    public  User getUserFromStringId(String idStr) throws InvalidParameterException {
+    public User getUserFromStringId(String idStr) throws InvalidParameterException {
         long id;
         try {
             id = Long.parseLong(idStr);
@@ -45,12 +50,15 @@ public class UserService {
         return CreateUserResponse.of(user);
     }
 
-    public RetrieveUserByIdResponse getById(Long id){
-        Optional<User> user = userRepository.findById(id);
-        if(user.isEmpty()){
-            throw NoSuchEntityException.withId(User.class.getSimpleName(), id);
-        }
-        return RetrieveUserMapper.toGetUserByIdResponse(user.get());
+    public RetrieveUserByIdResponse getById(String id) throws InvalidParameterException {
+        User user = getUserFromStringId(id);
+        return RetrieveUserMapper.toGetUserByIdResponse(user);
+    }
+    
+    public GetUserPublicationsResponse getUserPublications(String userId) throws InvalidParameterException {
+        User user = getUserFromStringId(userId);
+        GetUserPublicationMapper mapper = new GetUserPublicationMapper(baseURL);
+        return mapper.getResponse(user);
     }
 
     public void deleteUser(DeleteUserRequest deleteUserRequest) throws InvalidParameterException {
@@ -77,9 +85,6 @@ public class UserService {
         User userToFollow = getUserFromStringId(updateFollowUserRequest.getUserToFollowId());
         user.getFollows().add(0, userToFollow);
         userRepository.save(user);
-//        ??
-//        userToFollow.getFollowedBy().add(0, user);
-//        userRepository.save(userToFollow);
     }
     public void unfollow(UpdateUnfollowUserRequest updateUnfollowUserRequest) throws InvalidParameterException {
         User user = getUserFromStringId(updateUnfollowUserRequest.getUserId());
@@ -94,6 +99,5 @@ public class UserService {
                 .collect(Collectors.toList());
         user.setFollows(newFollows);
         userRepository.save(user);
-        //Same for followed by??
     }
 }

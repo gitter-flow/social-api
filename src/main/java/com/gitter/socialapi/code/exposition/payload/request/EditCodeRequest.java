@@ -11,5 +11,5 @@ public class EditCodeRequest {
 
     private String publication;
 
-    private String typeCode;
+    private String codeType;
 }

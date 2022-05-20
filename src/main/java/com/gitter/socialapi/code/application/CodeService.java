@@ -1,100 +1,94 @@
 package com.gitter.socialapi.code.application;
-import com.gitter.socialapi.code.domain.CodeEntity;
-import com.gitter.socialapi.code.infrastructure.CodeRepository;
-import com.gitter.socialapi.publication.domain.TypeCode;
-import com.gitter.socialapi.code.exposition.payload.request.CreationCodeRequest;
+
+import com.gitter.socialapi.code.domain.Code;
 import com.gitter.socialapi.code.exposition.payload.request.AddVersionCodeRequest;
-import com.gitter.socialapi.code.exposition.payload.request.EditCodeRequest;
+import com.gitter.socialapi.code.exposition.payload.request.CreateCodeRequest;
+import com.gitter.socialapi.code.exposition.payload.request.DeleteCodeRequest;
 import com.gitter.socialapi.code.exposition.payload.request.GetVersionCodeRequest;
 import com.gitter.socialapi.code.exposition.payload.response.AddVersionCodeResponse;
+import com.gitter.socialapi.code.exposition.payload.response.CreateCodeResponse;
+import com.gitter.socialapi.code.exposition.payload.response.GetCodeResponse;
+import com.gitter.socialapi.code.exposition.payload.response.GetCodeVersionsResponse;
+import com.gitter.socialapi.code.infrastructure.CodeRepository;
+import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
+import com.gitter.socialapi.kernel.exceptions.InvalidTypeCodeException;
+import com.gitter.socialapi.kernel.exceptions.NoSuchEntityException;
+import com.gitter.socialapi.kernel.utils.DateGenerator;
+import com.gitter.socialapi.publication.domain.Publication;
 import com.gitter.socialapi.publication.infrastructure.PublicationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 
 @Service
 public class CodeService {
-
     private final CodeRepository codeRepository;
     private final PublicationRepository publicationRepository;
-
+    private final String baseURL;
+    
     @Autowired
-    public CodeService(CodeRepository codeRepository, PublicationRepository publicationRepository) {
+    public CodeService(CodeRepository codeRepository, PublicationRepository publicationRepository, @Value("${application.url}") String baseURL) {
         this.codeRepository = codeRepository;
         this.publicationRepository = publicationRepository;
-    }
-
-
-    public Long addCode(CreationCodeRequest codeDto){
-        CodeEntity code = new CodeEntity();
-        code.setPublication(publicationRepository.getById(Long.valueOf(codeDto.getPublication())));
-        code.setBucket(codeDto.getBucket());
-        TypeCode typeCode = TypeCode.valueOf(codeDto.getTypeCode());
-        if(typeCode==null){
-            throw new IllegalStateException("The typeCode does not exist");
-        }
-
-        code.setTypeCode(typeCode);
-        List<String> versions = code.getVersions();
-        versions.add(0,codeDto.getVersion());
-        code.setVersions(versions);
-        codeRepository.save(code);
-        return code.getId();
-    }
-
-    public AddVersionCodeResponse addVersion(AddVersionCodeRequest addVersionCodeRequest){
-        Optional<CodeEntity> codeFound = codeRepository.findById(Long.valueOf(addVersionCodeRequest.getId()));
-        if(codeFound.isEmpty()){
-            throw new NullPointerException("Code not found");
-        }
-        List<String> versions = codeFound.get().getVersions();
-        versions.add(0, addVersionCodeRequest.getVersion());
-        codeFound.get().setVersions(versions);
-        codeRepository.save(codeFound.get());
-         AddVersionCodeResponse addVersionCodeResponse = new AddVersionCodeResponse(codeFound.get().getId().toString());
-        return addVersionCodeResponse;
+        this.baseURL = baseURL;
     }
     
-    public List<String> getVersions(GetVersionCodeRequest getVersionCodeRequest){
-        Optional<CodeEntity> codeFound = codeRepository.findById(Long.valueOf(getVersionCodeRequest.getId()));
-        if(codeFound.isEmpty()){
-            throw new NullPointerException("Code not found");
+    private static Long getIdFromString(String idStr) throws InvalidParameterException {
+        long id;
+        try {
+            id = Long.parseLong(idStr);
+        } catch (NumberFormatException nfe) {
+            throw InvalidParameterException.forField("id", idStr);
         }
-
-        return codeFound.get().getVersions();
+        return id;
     }
-    public List<CodeEntity> getCodes(){
-        return codeRepository.findAll();
+    public Code getCodeFromIdString(String idStr) throws InvalidParameterException {
+        Long id = getIdFromString(idStr);
+        Optional<Code> code = codeRepository.findById(id);
+        if(code.isEmpty()){
+            throw NoSuchEntityException.withId(org.aspectj.apache.bcel.classfile.Code.class.getSimpleName(), id);
+        }
+        return code.get();
+    }
+    public Publication getPublicationFromIdString(String idStr) throws InvalidParameterException {
+        Long id = getIdFromString(idStr);
+        Optional<Publication> publication = publicationRepository.findById(id);
+
+        if(publication.isEmpty()){
+            throw NoSuchEntityException.withId(Publication.class.getSimpleName(), id);
+        }
+        return publication.get();
+    }
+    
+    public CreateCodeResponse createCode(CreateCodeRequest codeRequest) throws InvalidParameterException, InvalidTypeCodeException {
+        Publication publication = getPublicationFromIdString(codeRequest.getPublicationId());
+        Code code = codeRepository.save(CreateCodeMapper.toCode(codeRequest, publication));
+        return CreateCodeMapper.getResponse(code);
+    }
+    
+    public GetCodeResponse getCodeFromId(String id) throws InvalidParameterException {
+        Code code = getCodeFromIdString(id);
+        GetCodeMapper mapper = new GetCodeMapper(baseURL);
+        return mapper.getResponse(code);
+    }
+    public AddVersionCodeResponse addVersion(AddVersionCodeRequest addVersionCodeRequest) throws InvalidParameterException {
+        DateGenerator dateGenerator = new DateGenerator();
+        Code code = getCodeFromIdString(addVersionCodeRequest.getId());
+        code.getVersions().add(dateGenerator.now());
+        codeRepository.save(code);
+        return new AddVersionCodeResponse(code.getVersions().get(0));
+    }
+    
+    public GetCodeVersionsResponse getVersions(GetVersionCodeRequest getVersionCodeRequest) throws InvalidParameterException {
+        Code code = getCodeFromIdString(getVersionCodeRequest.getId());
+        return new GetCodeVersionsResponse(code.getVersions());
     }
 
-    public void updateCode(EditCodeRequest codeDto){
-        Optional<CodeEntity> codeFound = codeRepository.findById(Long.valueOf(codeDto.getId()));
-        if (codeFound.isPresent()) {
-            codeFound.get().setPublication(publicationRepository.getById(Long.valueOf(codeDto.getPublication())));
-            codeFound.get().setBucket(codeDto.getBucket());
-            TypeCode typeCode = TypeCode.valueOf(codeDto.getTypeCode());
-            if(typeCode==null){
-                throw new IllegalStateException("The typeCode does not exist");
-            }
-
-            codeFound.get().setTypeCode(typeCode);
-            codeRepository.save(codeFound.get());
-        }
-        else {
-            throw new NullPointerException("Code not found");
-        }
-    }
-
-    public void deleteCode(Long id){
-        Optional<CodeEntity> codeEntityFound = codeRepository.findById(id);
-        if(codeEntityFound.isPresent()){
-            codeRepository.delete(codeEntityFound.get());
-        }
-        else {
-            throw new NullPointerException("Code not found");
-        }
+    public void deleteCode(DeleteCodeRequest deleteCodeRequest) throws InvalidParameterException {
+        Code code = getCodeFromIdString(deleteCodeRequest.getId());
+        codeRepository.delete(code);
     }
 }

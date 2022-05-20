@@ -2,8 +2,11 @@ package com.gitter.socialapi.code.exposition.payload.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-@Getter
+
+import java.util.List;
+
 @AllArgsConstructor
-public class AddVersionCodeResponse {
-    private String version;
+@Getter
+public class GetCodeVersionsResponse {
+    private List<String> versions;
 }

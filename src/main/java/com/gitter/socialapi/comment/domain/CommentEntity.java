@@ -1,6 +1,6 @@
 package com.gitter.socialapi.comment.domain;
 
-import com.gitter.socialapi.publication.domain.PublicationEntity;
+import com.gitter.socialapi.publication.domain.Publication;
 import com.gitter.socialapi.user.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,7 +26,7 @@ public class CommentEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="publication_id")
-    private PublicationEntity publication;
+    private Publication publication;
 
     private String content;
 

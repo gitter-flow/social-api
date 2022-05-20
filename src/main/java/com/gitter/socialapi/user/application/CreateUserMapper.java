@@ -9,6 +9,7 @@ public class CreateUserMapper {
     public static User getUser(CreateUserRequest createUserRequest) {
         return new User(
                 createUserRequest.getKeycloakId(),
+                createUserRequest.getUsername(),
                 createUserRequest.getDescription(),
                 createUserRequest.getFirstName(),
                 createUserRequest.getLastName(),

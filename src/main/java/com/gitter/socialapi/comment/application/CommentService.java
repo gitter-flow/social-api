@@ -25,7 +25,6 @@ public class CommentService {
         this.userRepository = userRepository;
     }
 
-
     public Long addComment(CommentEntity commentEntity){
         commentRepository.save(commentEntity);
         return commentEntity.getId();
