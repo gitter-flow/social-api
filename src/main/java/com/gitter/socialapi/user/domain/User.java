@@ -41,7 +41,7 @@ public class User {
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "follows")
     private Set<User> followedBy = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, targetEntity = Publication.class)
     private Set<Publication> publications = new HashSet<>();
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
@@ -56,5 +56,9 @@ public class User {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;        
+    }
+    public void addNewPublication(Publication publication) {
+        this.publications.add(publication);
+        publication.setUser(this);
     }
 }

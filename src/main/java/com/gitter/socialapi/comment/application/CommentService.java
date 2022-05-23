@@ -1,12 +1,20 @@
 package com.gitter.socialapi.comment.application;
-import com.gitter.socialapi.comment.domain.CommentEntity;
+import com.gitter.socialapi.comment.domain.Comment;
+import com.gitter.socialapi.comment.exposition.payload.request.*;
+import com.gitter.socialapi.comment.exposition.payload.response.CreateCommentResponse;
+import com.gitter.socialapi.comment.exposition.payload.response.GetPublicationCommentsResponse;
 import com.gitter.socialapi.comment.infrastructure.CommentRepository;
+import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
+import com.gitter.socialapi.kernel.exceptions.NoSuchEntityException;
+import com.gitter.socialapi.publication.application.PublicationService;
+import com.gitter.socialapi.publication.domain.Publication;
+import com.gitter.socialapi.user.application.UserService;
 import com.gitter.socialapi.user.domain.User;
-import com.gitter.socialapi.comment.exposition.payload.request.UpdateCommentRequest;
-import com.gitter.socialapi.comment.exposition.payload.request.LikeCommentRequest;
-import com.gitter.socialapi.comment.exposition.payload.request.GetCommentRequest;
 import com.gitter.socialapi.user.infrastructure.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,39 +26,54 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
-
+    private final UserService userService;
+    private final PublicationService publicationService;
+    private final String baseURL;
+    
     @Autowired
-    public CommentService(CommentRepository commentRepository, UserRepository userRepository) {
+    public CommentService(CommentRepository commentRepository, UserRepository userRepository, UserService userService, PublicationService publicationService, @Value("${application.url}") String baseURL) {
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
+        this.userService = userService;
+        this.publicationService = publicationService;
+        this.baseURL = baseURL;
     }
 
-    public Long addComment(CommentEntity commentEntity){
-        commentRepository.save(commentEntity);
-        return commentEntity.getId();
-    }
-
-    public List<CommentEntity> getComments(){
-        return commentRepository.findAll();
-    }
-
-    public void updateComment(CommentEntity comment){
-        Optional<CommentEntity> commentFound = commentRepository.findById(comment.getId());
-        if (commentFound.isPresent()) {
-            commentFound.get().setContent(comment.getContent());
-            commentFound.get().setPublication(comment.getPublication());
-            commentFound.get().setUser(comment.getUser());
-            List<User> usersLiked = commentFound.get().getLikedBy();
-            comment.getLikedBy().forEach(user -> usersLiked.add(user));
-            commentFound.get().setLikedBy(usersLiked);
+    private Long getIdToLong(String idStr) throws InvalidParameterException {
+        long id;
+        try {
+            id = Long.parseLong(idStr);
+        } catch (NumberFormatException nfe) {
+            throw InvalidParameterException.forField("id", idStr);
         }
-        else {
-            throw new NullPointerException("Code not found");
+        return id;
+    }
+    public Comment getCommentFromIdString(String idStr) throws InvalidParameterException {
+        Long id = getIdToLong(idStr);
+        Optional<Comment> comment = commentRepository.findById(id);
+        if(comment.isEmpty()){
+            throw NoSuchEntityException.withId(Publication.class.getSimpleName(), id);
         }
+        return comment.get();
+    }
+    
+    public CreateCommentResponse createComment(CreateCommentRequest commentRequest) throws InvalidParameterException {
+        User user = userService.getUserFromStringId(commentRequest.getUserId());
+        Publication publication = publicationService.getPublicationFromIdString(commentRequest.getPublicationId());
+        Comment comment = CreateCommentMapper.toComment(commentRequest, user, publication);
+        commentRepository.save(comment);
+        return CreateCommentMapper.toResponse(comment);
+    }
+    
+    
+    public void updateComment(UpdateCommentRequest updateRequest) throws InvalidParameterException {
+        Comment comment = getCommentFromIdString(updateRequest.getId());
+        comment.setContent(updateRequest.getContent());
+        commentRepository.save(comment);
     }
 
     public void deleteComment(Long id){
-        Optional<CommentEntity> commentFound = commentRepository.findById(id);
+        Optional<Comment> commentFound = commentRepository.findById(id);
         if(commentFound.isPresent()){
             commentRepository.delete(commentFound.get());
         }
@@ -59,53 +82,35 @@ public class CommentService {
         }
     }
 
-    public void likeComment(LikeCommentRequest editLikeCommentRequest) {
-        Optional<CommentEntity> commentFound = commentRepository.findById(Long.parseLong(editLikeCommentRequest.getCommentId()));
-        if (commentFound.isPresent()) {
-            List<User> likedBy = commentFound.get().getLikedBy();
-            Optional<User> userFound = userRepository.findById(Long.parseLong(editLikeCommentRequest.getUserId()));
-            if(userFound.isPresent()){
-                likedBy.add(userFound.get());
-                commentRepository.save(commentFound.get());
-            }else {
-                throw new NullPointerException("User not found");
-            }
-        }
-        else {
-            throw new NullPointerException("Publication not found");
-        }
+    public void likeComment(LikeCommentRequest likeRequest) throws InvalidParameterException {
+        Comment comment = getCommentFromIdString(likeRequest.getCommentId());
+        User user = userService.getUserFromStringId(likeRequest.getUserId());
+        comment.getLikedBy().add(user);
+        commentRepository.save(comment);
     }
 
-    public void unlikeComment(LikeCommentRequest editLikeCommentRequest) {
-        Optional<CommentEntity> commentFound = commentRepository.findById(Long.parseLong(editLikeCommentRequest.getCommentId()));
-        if (commentFound.isPresent()) {
-            List<User> likedBy = commentFound.get().getLikedBy();
-            Optional<User> userFound = userRepository.findById(Long.parseLong(editLikeCommentRequest.getUserId()));
-            if(userFound.isPresent()){
-                likedBy.remove(userFound.get());
-                commentRepository.save(commentFound.get());
-            }else {
-                throw new NullPointerException("User not found");
-            }
-        }
-        else {
-            throw new NullPointerException("Publication not found");
-        }
+    public void unlikeComment(UnlikeCommentRequest unlikeRequest) throws InvalidParameterException {
+        Comment comment = getCommentFromIdString(unlikeRequest.getCommentId());
+        User user = userService.getUserFromStringId(unlikeRequest.getUserId());
+        comment.getLikedBy().remove(user);
+        commentRepository.save(comment);
     }
 
-    public void updateContentComment(UpdateCommentRequest contentCommentRequest) {
-        Optional<CommentEntity> commentFound = commentRepository.findById(Long.parseLong(contentCommentRequest.getId()));
-        if (commentFound.isPresent()) {
-            commentFound.get().setContent(contentCommentRequest.getContent());
-            commentRepository.save(commentFound.get());
-        }
-        else {
-            throw new NullPointerException("Publication not found");
-        }
+    public void updateContentComment(UpdateCommentRequest updateCommentRequest) throws InvalidParameterException {
+        Comment comment = getCommentFromIdString(updateCommentRequest.getId());
+        comment.setContent(updateCommentRequest.getContent());
+        commentRepository.save(comment);
     }
-
-
-    public  List<CommentEntity> getCommentPublication(GetCommentRequest getCommentPublicationRequest) {
-        return commentRepository.getCommentEntitiesByPublication_Id(Long.valueOf(getCommentPublicationRequest.getPublicationId()));
+    
+    public List<GetPublicationCommentsResponse> getCommentPublication(GetPublicationCommentsRequest getPublicationCommentRequest) {
+        Page<Comment> comments = commentRepository.getPublicationCommentById(
+                getPublicationCommentRequest.getId(), 
+                PageRequest.of(
+                        getPublicationCommentRequest.getPageNumber(), 
+                        getPublicationCommentRequest.getNumberPerPages()
+                )
+        );
+        GetPublicationCommentsMapper mapper = new GetPublicationCommentsMapper(baseURL);
+        return mapper.toResponse(comments);
     }
 }

@@ -2,10 +2,7 @@ package com.gitter.socialapi.publication.domain;
 
 import com.gitter.socialapi.code.domain.Code;
 import com.gitter.socialapi.user.domain.User;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;

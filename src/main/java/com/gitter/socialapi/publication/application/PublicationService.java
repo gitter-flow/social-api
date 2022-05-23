@@ -11,10 +11,12 @@ import com.gitter.socialapi.publication.exposition.payload.response.GetPublicati
 import com.gitter.socialapi.publication.infrastructure.PublicationRepository;
 import com.gitter.socialapi.user.application.UserService;
 import com.gitter.socialapi.user.domain.User;
+import com.gitter.socialapi.publication.exposition.payload.response.GetUserPublicationsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -39,13 +41,18 @@ public class PublicationService {
         this.baseURL = baseURL;
     }
     
-    public Publication getPublicationFromIdString(String idStr) throws InvalidParameterException {
+    
+    private Long getIdToLong(String idStr) throws InvalidParameterException {
         long id;
         try {
             id = Long.parseLong(idStr);
         } catch (NumberFormatException nfe) {
             throw InvalidParameterException.forField("id", idStr);
         }
+        return id;
+    }
+    public Publication getPublicationFromIdString(String idStr) throws InvalidParameterException {
+        Long id = getIdToLong(idStr);
         Optional<Publication> publication = publicationRepository.findById(id);
 
         if(publication.isEmpty()){
@@ -81,7 +88,12 @@ public class PublicationService {
         GetPublicationMapper mapper = new GetPublicationMapper(baseURL);
         return mapper.toResponse(publication);
     }
-    
+
+    public GetUserPublicationsResponse getUserPublications(String userId) throws InvalidParameterException {
+        GetUserPublicationMapper mapper = new GetUserPublicationMapper(baseURL);
+        List<Publication> publicationList = publicationRepository.selectWhereUserId(getIdToLong(userId));
+        return mapper.getResponse(publicationList);
+    }
     public void updatePublication(UpdatePublicationRequest updateRequest) throws InvalidParameterException {
         Publication publication = getPublicationFromIdString(updateRequest.getId());
         if(updateRequest.getContent() != null) {

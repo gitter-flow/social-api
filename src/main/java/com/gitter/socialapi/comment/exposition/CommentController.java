@@ -1,10 +1,11 @@
 package com.gitter.socialapi.comment.exposition;
 
-import com.gitter.socialapi.comment.domain.CommentEntity;
+import com.gitter.socialapi.comment.domain.Comment;
 import com.gitter.socialapi.comment.application.CommentService;
-import com.gitter.socialapi.comment.exposition.payload.request.UpdateCommentRequest;
-import com.gitter.socialapi.comment.exposition.payload.request.LikeCommentRequest;
-import com.gitter.socialapi.comment.exposition.payload.request.GetCommentRequest;
+import com.gitter.socialapi.comment.exposition.payload.request.*;
+import com.gitter.socialapi.comment.exposition.payload.response.CreateCommentResponse;
+import com.gitter.socialapi.comment.exposition.payload.response.GetPublicationCommentsResponse;
+import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,43 +15,38 @@ import java.util.List;
 @RestController
 @RequestMapping( value = "/comment")
 public class CommentController {
-    private CommentService commentService;
+    private final CommentService commentService;
     @Autowired
     CommentController(CommentService commentService) {
         this.commentService = commentService;
     }
-    @PostMapping
-    public ResponseEntity<Long> createComment(@RequestBody CommentEntity comment){
-        Long id = commentService.addComment(comment);
-        return ResponseEntity.ok(id);
-    }
-    @GetMapping("/all")
-    public ResponseEntity<List<CommentEntity>> getAll() {
-        return ResponseEntity.ok(commentService.getComments());
-    }
     
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
-        commentService.deleteComment(id);
-        return ResponseEntity.ok().build();
+    @PostMapping
+    public ResponseEntity<CreateCommentResponse> createComment(@RequestBody CreateCommentRequest comment) throws InvalidParameterException {
+        return ResponseEntity.ok(commentService.createComment(comment));
+    }
+    @DeleteMapping
+    public ResponseEntity<String> deleteComment(@RequestBody DeleteCommentRequest deleteRequest) {
+        commentService.deleteComment(deleteRequest.getId());
+        return ResponseEntity.ok(String.format("Comment %d deleted", deleteRequest.getId()));
     }
     @PutMapping
-    public ResponseEntity<Void> updateComment(@RequestBody UpdateCommentRequest contentCommentRequest) {
-        commentService.updateContentComment(contentCommentRequest);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<String> updateComment(@RequestBody UpdateCommentRequest updateRequest) throws InvalidParameterException {
+        commentService.updateContentComment(updateRequest);
+        return ResponseEntity.ok(String.format("Comment %s updated", updateRequest.getId()));
     }
     @GetMapping
-    public ResponseEntity<List<CommentEntity>> getCommentPublication(@RequestBody GetCommentRequest getCommentPublicationRequest){
+    public ResponseEntity<List<GetPublicationCommentsResponse>> getCommentPublication(@RequestBody GetPublicationCommentsRequest getCommentPublicationRequest){
         return ResponseEntity.ok(commentService.getCommentPublication(getCommentPublicationRequest));
     }
     @PostMapping("/like")
-    public ResponseEntity<Void> likePublication(@RequestBody LikeCommentRequest editLikeCommentRequest){
-        commentService.likeComment(editLikeCommentRequest);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<String> likePublication(@RequestBody LikeCommentRequest likeRequest) throws InvalidParameterException {
+        commentService.likeComment(likeRequest);
+        return ResponseEntity.ok(String.format("Comment %s liked by user %s", likeRequest.getCommentId(), likeRequest.getUserId()));
     }
     @PostMapping("/unlike")
-    public ResponseEntity<Void> unlikeComment(@RequestBody LikeCommentRequest editLikeCommentRequest){
-        commentService.unlikeComment(editLikeCommentRequest);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<String> unlikeComment(@RequestBody UnlikeCommentRequest unlikeRequest) throws InvalidParameterException {
+        commentService.unlikeComment(unlikeRequest);
+        return ResponseEntity.ok(String.format("Comment %s unliked by user %s", unlikeRequest.getCommentId(), unlikeRequest.getUserId()));
     }
 }

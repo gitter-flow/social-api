@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "comment")
-public class CommentEntity {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
@@ -33,4 +33,10 @@ public class CommentEntity {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     private List<User> likedBy = new ArrayList<>();
+
+    public Comment(User user, Publication publication, String content) {
+        this.user = user;
+        this.publication = publication;
+        this.content = content;
+    }
 }

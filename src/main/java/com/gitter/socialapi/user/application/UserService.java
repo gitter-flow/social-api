@@ -1,7 +1,6 @@
 package com.gitter.socialapi.user.application;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.kernel.exceptions.NoSuchEntityException;
-import com.gitter.socialapi.user.exposition.payload.response.GetUserPublicationsResponse;
 import com.gitter.socialapi.user.exposition.payload.request.*;
 import com.gitter.socialapi.user.exposition.payload.response.CreateUserResponse;
 import com.gitter.socialapi.user.infrastructure.UserRepository;
@@ -54,12 +53,6 @@ public class UserService {
         User user = getUserFromStringId(id);
         return RetrieveUserMapper.toGetUserByIdResponse(user);
     }
-    
-    public GetUserPublicationsResponse getUserPublications(String userId) throws InvalidParameterException {
-        User user = getUserFromStringId(userId);
-        GetUserPublicationMapper mapper = new GetUserPublicationMapper(baseURL);
-        return mapper.getResponse(user);
-    }
 
     public void deleteUser(DeleteUserRequest deleteUserRequest) throws InvalidParameterException {
         long id;
@@ -100,4 +93,5 @@ public class UserService {
         user.setFollows(newFollows);
         userRepository.save(user);
     }
+    
 }

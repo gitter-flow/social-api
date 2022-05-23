@@ -5,7 +5,6 @@ import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.user.application.UserService;
 import com.gitter.socialapi.user.exposition.payload.request.*;
 import com.gitter.socialapi.user.exposition.payload.response.CreateUserResponse;
-import com.gitter.socialapi.user.exposition.payload.response.GetUserPublicationsResponse;
 import com.gitter.socialapi.user.exposition.payload.response.RetrieveUserByIdResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -36,28 +35,30 @@ public class UserController {
         RetrieveUserByIdResponse userResponse = userService.getById(id);
         return ResponseEntity.ok(userResponse);
     }
-    @GetMapping("/publications")
-    public ResponseEntity<GetUserPublicationsResponse> getUserPublications(@RequestBody GetUserPublicationRequest getRequest) throws InvalidParameterException {
-        return ResponseEntity.ok(userService.getUserPublications(getRequest.getId()));
-    }
     @PutMapping
-    public ResponseEntity<Void> updateUser(@RequestBody UpdateUserRequest updateUserRequest) throws InvalidParameterException {
+    public ResponseEntity<String> updateUser(@RequestBody UpdateUserRequest updateUserRequest) throws InvalidParameterException {
         userService.updateUser(updateUserRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(String.format("User %s updated", updateUserRequest.getId()));
     }
     @PutMapping("/follow")
-    public ResponseEntity<Void> follow(@RequestBody UpdateFollowUserRequest updateFollowUserRequest) throws InvalidParameterException {
-        userService.follow(updateFollowUserRequest);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<String> follow(@RequestBody UpdateFollowUserRequest followUserRequest) throws InvalidParameterException {
+        userService.follow(followUserRequest);
+        return ResponseEntity.ok(String.format(
+                "User %s followed by user %s", 
+                followUserRequest.getUserToFollowId(), 
+                followUserRequest.getUserId()));
     }
     @PutMapping("/unfollow")
-    public ResponseEntity<Void> unfollow(@RequestBody UpdateUnfollowUserRequest editFollowUserRequest) throws InvalidParameterException {
-        userService.unfollow(editFollowUserRequest);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<String> unfollow(@RequestBody UpdateUnfollowUserRequest unfollowUserRequest) throws InvalidParameterException {
+        userService.unfollow(unfollowUserRequest);
+        return ResponseEntity.ok(String.format(
+                "User %s followed by user %s",
+                unfollowUserRequest.getUserToUnfollowId(),
+                unfollowUserRequest.getUserId()));
     }
     @DeleteMapping
-    public ResponseEntity<Void> deleteUser(@RequestBody DeleteUserRequest deleteUserRequest) throws InvalidParameterException {
+    public ResponseEntity<String> deleteUser(@RequestBody DeleteUserRequest deleteUserRequest) throws InvalidParameterException {
         userService.deleteUser(deleteUserRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(String.format("User %s deleted", deleteUserRequest.getId()));
     }
 }

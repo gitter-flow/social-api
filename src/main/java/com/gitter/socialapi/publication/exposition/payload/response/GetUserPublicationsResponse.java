@@ -1,4 +1,4 @@
-package com.gitter.socialapi.user.exposition.payload.response;
+package com.gitter.socialapi.publication.exposition.payload.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
