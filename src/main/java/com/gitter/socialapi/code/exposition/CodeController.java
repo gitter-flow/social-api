@@ -4,11 +4,11 @@ import com.gitter.socialapi.code.application.CodeService;
 import com.gitter.socialapi.code.exposition.payload.request.AddVersionCodeRequest;
 import com.gitter.socialapi.code.exposition.payload.request.CreateCodeRequest;
 import com.gitter.socialapi.code.exposition.payload.request.DeleteCodeRequest;
-import com.gitter.socialapi.code.exposition.payload.request.GetVersionCodeRequest;
+import com.gitter.socialapi.code.exposition.payload.request.RetrieveVersionCodeRequest;
 import com.gitter.socialapi.code.exposition.payload.response.AddVersionCodeResponse;
 import com.gitter.socialapi.code.exposition.payload.response.CreateCodeResponse;
-import com.gitter.socialapi.code.exposition.payload.response.GetCodeResponse;
-import com.gitter.socialapi.code.exposition.payload.response.GetCodeVersionsResponse;
+import com.gitter.socialapi.code.exposition.payload.response.RetrieveCodeResponse;
+import com.gitter.socialapi.code.exposition.payload.response.RetrieveCodeVersionsResponse;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.kernel.exceptions.InvalidTypeCodeException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,12 +38,12 @@ public class CodeController {
         return codeService.addVersion(addVersionCodeRequest);
     }
     @GetMapping("/{id}")
-    public ResponseEntity<GetCodeResponse> getCodeFromId(@PathVariable String id) throws InvalidParameterException {
+    public ResponseEntity<RetrieveCodeResponse> getCodeFromId(@PathVariable String id) throws InvalidParameterException {
         return ResponseEntity.ok(codeService.getCodeFromId(id));
     }
     @GetMapping("/versions")
-    public ResponseEntity<GetCodeVersionsResponse> getVersions(@RequestBody GetVersionCodeRequest getVersionCodeRequest) throws InvalidParameterException {
-        GetCodeVersionsResponse versions = codeService.getVersions(getVersionCodeRequest);
+    public ResponseEntity<RetrieveCodeVersionsResponse> getVersions(@RequestBody RetrieveVersionCodeRequest getVersionCodeRequest) throws InvalidParameterException {
+        RetrieveCodeVersionsResponse versions = codeService.getVersions(getVersionCodeRequest);
        return ResponseEntity.ok(versions);
     }
     @DeleteMapping("/{id}")

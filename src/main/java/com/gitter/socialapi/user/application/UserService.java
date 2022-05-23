@@ -3,13 +3,20 @@ import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.kernel.exceptions.NoSuchEntityException;
 import com.gitter.socialapi.user.exposition.payload.request.*;
 import com.gitter.socialapi.user.exposition.payload.response.CreateUserResponse;
+import com.gitter.socialapi.user.exposition.payload.request.RetrieveUserFollowersRequest;
+import com.gitter.socialapi.user.exposition.payload.response.RetrieveUserFollowersResponse;
+import com.gitter.socialapi.user.exposition.payload.response.RetrieveUserFollowsResponse;
 import com.gitter.socialapi.user.infrastructure.UserRepository;
 import com.gitter.socialapi.user.domain.User;
 import com.gitter.socialapi.user.exposition.payload.response.RetrieveUserByIdResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,7 +43,6 @@ public class UserService {
             throw InvalidParameterException.forField("id", idStr);
         }
         Optional<User> user = userRepository.findById(id);
-
         if(user.isEmpty()){
             throw NoSuchEntityException.withId(User.class.getSimpleName(), id);
         }
@@ -53,19 +59,25 @@ public class UserService {
         User user = getUserFromStringId(id);
         return RetrieveUserMapper.toGetUserByIdResponse(user);
     }
+    
+    public List<RetrieveUserFollowersResponse> retrieveUserFollowers(RetrieveUserFollowersRequest request) throws InvalidParameterException {
+        List<User> followers = new ArrayList<>(getUserFromStringId(request.getUserId()).getFollowedBy());
+        Page<User> pageFollowers = new PageImpl<>(followers, PageRequest.of(request.getPageNumber(), request.getNumberPerPage()), followers.size());
+        RetrieveUserFollowersMapper mapper = new RetrieveUserFollowersMapper(baseURL);
+        return mapper.toResponse(pageFollowers);
+    }
+
+    public List<RetrieveUserFollowsResponse> retrieveUserFollows(RetrieveUserFollowsRequest request) throws InvalidParameterException {
+        List<User> follows = new ArrayList<>(getUserFromStringId(request.getUserId()).getFollows());
+        Page<User> pageFollows = new PageImpl<>(follows, PageRequest.of(request.getPageNumber(), request.getNumberPerPage()), follows.size());
+        RetrieveUserFollowsMapper mapper = new RetrieveUserFollowsMapper(baseURL);
+        return mapper.toResponse(pageFollows);
+    }
+    
 
     public void deleteUser(DeleteUserRequest deleteUserRequest) throws InvalidParameterException {
-        long id;
-        try {
-            id = Long.parseLong(deleteUserRequest.getId());
-        } catch (NumberFormatException nfe) {
-            throw InvalidParameterException.forField("id", deleteUserRequest.getId());
-        }
-        Optional<User> user = userRepository.findById(id);
-        if(user.isEmpty()){
-            throw NoSuchEntityException.withId(User.class.getSimpleName(), id);
-        }
-        userRepository.delete(user.get());
+        User user = getUserFromStringId(deleteUserRequest.getId());
+        userRepository.delete(user);
     }
     
     public void updateUser(UpdateUserRequest userRequest) throws InvalidParameterException {

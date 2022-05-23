@@ -1,17 +1,17 @@
 package com.gitter.socialapi.code.application;
 
 import com.gitter.socialapi.code.domain.Code;
-import com.gitter.socialapi.code.exposition.payload.response.GetCodeResponse;
+import com.gitter.socialapi.code.exposition.payload.response.RetrieveCodeResponse;
 
-public class GetCodeMapper {
+public class RetrieveCodeMapper {
     private final String baseURL;
 
-    public GetCodeMapper(String baseURL) {
+    public RetrieveCodeMapper(String baseURL) {
         this.baseURL = baseURL;
     }
 
-    public GetCodeResponse getResponse(Code code) {
-        return new GetCodeResponse(
+    public RetrieveCodeResponse getResponse(Code code) {
+        return new RetrieveCodeResponse(
                 String.format("%s/publication/%d", baseURL, code.getPublication().getId()),
                 code.getBucketLocation(),
                 code.getCodeType().getText(),

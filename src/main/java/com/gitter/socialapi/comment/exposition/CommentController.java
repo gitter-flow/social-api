@@ -1,10 +1,9 @@
 package com.gitter.socialapi.comment.exposition;
 
-import com.gitter.socialapi.comment.domain.Comment;
 import com.gitter.socialapi.comment.application.CommentService;
 import com.gitter.socialapi.comment.exposition.payload.request.*;
 import com.gitter.socialapi.comment.exposition.payload.response.CreateCommentResponse;
-import com.gitter.socialapi.comment.exposition.payload.response.GetPublicationCommentsResponse;
+import com.gitter.socialapi.comment.exposition.payload.response.RetrievePublicationCommentsResponse;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +35,7 @@ public class CommentController {
         return ResponseEntity.ok(String.format("Comment %s updated", updateRequest.getId()));
     }
     @GetMapping
-    public ResponseEntity<List<GetPublicationCommentsResponse>> getCommentPublication(@RequestBody GetPublicationCommentsRequest getCommentPublicationRequest){
+    public ResponseEntity<List<RetrievePublicationCommentsResponse>> getCommentPublication(@RequestBody RetrievePublicationCommentsRequest getCommentPublicationRequest){
         return ResponseEntity.ok(commentService.getCommentPublication(getCommentPublicationRequest));
     }
     @PostMapping("/like")

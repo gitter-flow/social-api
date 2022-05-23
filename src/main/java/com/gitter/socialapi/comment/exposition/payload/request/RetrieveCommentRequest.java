@@ -3,6 +3,6 @@ package com.gitter.socialapi.comment.exposition.payload.request;
 import lombok.Getter;
 
 @Getter
-public class GetCommentRequest {
+public class RetrieveCommentRequest {
     private String publicationId;
 }

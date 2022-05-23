@@ -1,18 +1,18 @@
 package com.gitter.socialapi.publication.application;
 
 import com.gitter.socialapi.publication.domain.Publication;
-import com.gitter.socialapi.publication.exposition.payload.response.GetPublicationResponse;
+import com.gitter.socialapi.publication.exposition.payload.response.RetrievePublicationResponse;
 
 import java.util.stream.Collectors;
 
-public class GetPublicationMapper {
+public class RetrievePublicationMapper {
     private final String baseURL;
 
-    public GetPublicationMapper(String baseURL) {
+    public RetrievePublicationMapper(String baseURL) {
         this.baseURL = baseURL;
     }
 
-    public GetPublicationResponse toResponse(Publication publication) {
+    public RetrievePublicationResponse toResponse(Publication publication) {
         String codeURI = null, sharedPublicationURI = null, parentPublicationURI = null;
         if(publication.getCode() != null) {
             codeURI = String.format("%s/code/%d", baseURL, publication.getCode().getId());
@@ -22,7 +22,7 @@ public class GetPublicationMapper {
         } else if(publication.getParentPublication() != null) {
             parentPublicationURI = String.format("%s/publication/%d", baseURL, publication.getCode().getId());
         }
-        return GetPublicationResponse.of(
+        return RetrievePublicationResponse.of(
                 String.format("%s/user/%d", baseURL, publication.getUser().getId()),
                 publication.getContent(),
                 codeURI,

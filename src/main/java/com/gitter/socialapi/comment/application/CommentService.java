@@ -2,7 +2,7 @@ package com.gitter.socialapi.comment.application;
 import com.gitter.socialapi.comment.domain.Comment;
 import com.gitter.socialapi.comment.exposition.payload.request.*;
 import com.gitter.socialapi.comment.exposition.payload.response.CreateCommentResponse;
-import com.gitter.socialapi.comment.exposition.payload.response.GetPublicationCommentsResponse;
+import com.gitter.socialapi.comment.exposition.payload.response.RetrievePublicationCommentsResponse;
 import com.gitter.socialapi.comment.infrastructure.CommentRepository;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.kernel.exceptions.NoSuchEntityException;
@@ -102,15 +102,15 @@ public class CommentService {
         commentRepository.save(comment);
     }
     
-    public List<GetPublicationCommentsResponse> getCommentPublication(GetPublicationCommentsRequest getPublicationCommentRequest) {
-        Page<Comment> comments = commentRepository.getPublicationCommentById(
+    public List<RetrievePublicationCommentsResponse> getCommentPublication(RetrievePublicationCommentsRequest getPublicationCommentRequest) {
+        Page<Comment> comments = commentRepository.selectWherePublicationIdEquals(
                 getPublicationCommentRequest.getId(), 
                 PageRequest.of(
                         getPublicationCommentRequest.getPageNumber(), 
                         getPublicationCommentRequest.getNumberPerPages()
                 )
         );
-        GetPublicationCommentsMapper mapper = new GetPublicationCommentsMapper(baseURL);
+        RetrievePublicationCommentsMapper mapper = new RetrievePublicationCommentsMapper(baseURL);
         return mapper.toResponse(comments);
     }
 }

@@ -4,12 +4,13 @@ import com.gitter.socialapi.publication.domain.Publication;
 import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Data
 @NoArgsConstructor
@@ -38,16 +39,24 @@ public class User {
     )
     private List<User> follows = new ArrayList<>();
     
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "follows")
-    private Set<User> followedBy = new HashSet<>();
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "follows", cascade = CascadeType.ALL)
+    private List<User> followedBy = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, targetEntity = Publication.class)
+    @OneToMany(fetch = FetchType.LAZY, targetEntity = Publication.class, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Publication> publications = new HashSet<>();
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<Publication> likedPublications = new HashSet<>();
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Date createdAt = new Date();
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt = LocalDateTime.now();
     
     public User(String keycloakId, String username, String description, String firstName, String lastName, String email) {
         this.keycloakId = keycloakId;

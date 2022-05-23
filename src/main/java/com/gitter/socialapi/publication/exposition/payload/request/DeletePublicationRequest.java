@@ -4,5 +4,5 @@ import lombok.Getter;
 
 @Getter
 public class DeletePublicationRequest {
-    private String id;
+    private Long id;
 }

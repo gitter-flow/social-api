@@ -7,17 +7,22 @@ import com.gitter.socialapi.kernel.exceptions.NoSuchEntityException;
 import com.gitter.socialapi.publication.domain.Publication;
 import com.gitter.socialapi.publication.exposition.payload.request.*;
 import com.gitter.socialapi.publication.exposition.payload.response.CreatePublicationResponse;
-import com.gitter.socialapi.publication.exposition.payload.response.GetPublicationResponse;
+import com.gitter.socialapi.publication.exposition.payload.response.RetrieveNewPublicationsResponse;
+import com.gitter.socialapi.publication.exposition.payload.response.RetrievePublicationResponse;
+import com.gitter.socialapi.publication.exposition.payload.response.RetrieveUserPublicationsResponse;
 import com.gitter.socialapi.publication.infrastructure.PublicationRepository;
 import com.gitter.socialapi.user.application.UserService;
 import com.gitter.socialapi.user.domain.User;
-import com.gitter.socialapi.publication.exposition.payload.response.GetUserPublicationsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 @Service
@@ -82,16 +87,15 @@ public class PublicationService {
         
         return CreatePublicationMapper.toResponse(publication);
     }
-    
-    public GetPublicationResponse getPublicationByID(String id) throws InvalidParameterException {
+    public RetrievePublicationResponse getPublicationByID(String id) throws InvalidParameterException {
         Publication publication = getPublicationFromIdString(id);
-        GetPublicationMapper mapper = new GetPublicationMapper(baseURL);
+        RetrievePublicationMapper mapper = new RetrievePublicationMapper(baseURL);
         return mapper.toResponse(publication);
     }
-
-    public GetUserPublicationsResponse getUserPublications(String userId) throws InvalidParameterException {
-        GetUserPublicationMapper mapper = new GetUserPublicationMapper(baseURL);
-        List<Publication> publicationList = publicationRepository.selectWhereUserId(getIdToLong(userId));
+    public RetrieveUserPublicationsResponse getUserPublications(RetrieveUserPublicationRequest getRequest) throws InvalidParameterException {
+        RetrieveUserPublicationMapper mapper = new RetrieveUserPublicationMapper(baseURL);
+        PageRequest page = PageRequest.of(getRequest.getPageNumber(), getRequest.getNumberPerPage());
+        List<Publication> publicationList = publicationRepository.selectWhereUserIdEquals(getIdToLong(getRequest.getId()), page);
         return mapper.getResponse(publicationList);
     }
     public void updatePublication(UpdatePublicationRequest updateRequest) throws InvalidParameterException {
@@ -104,6 +108,12 @@ public class PublicationService {
             publication.setCode(code);
         }
         publicationRepository.save(publication);
+    }
+    
+    public RetrieveNewPublicationsResponse getNewPublications(RetrieveNewPublicationsRequest getRequest) {
+        List<Publication> publications = new ArrayList<>(publicationRepository.selectWhereUserFollows(getRequest.getUserId(), PageRequest.of(getRequest.getPageNumber(), getRequest.getNumberPerPage())));
+        RetrieveNewPublicationsMapper mapper = new RetrieveNewPublicationsMapper(baseURL);
+        return mapper.toResponse(publications);
     }
     public void likePublication(UpdateLikePublicationRequest likePublicationRequest) throws InvalidParameterException {
         Publication publication = getPublicationFromIdString(likePublicationRequest.getPublicationId());
@@ -118,7 +128,6 @@ public class PublicationService {
         publicationRepository.save(publication);
     }
     public void deletePublication(DeletePublicationRequest deleteRequest) throws InvalidParameterException {
-        Publication publication = getPublicationFromIdString(deleteRequest.getId());
-        publicationRepository.delete(publication);
+        publicationRepository.deleteById(deleteRequest.getId());
     }
 }

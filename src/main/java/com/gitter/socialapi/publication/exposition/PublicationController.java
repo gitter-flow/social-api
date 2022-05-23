@@ -4,9 +4,10 @@ import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.publication.application.PublicationService;
 import com.gitter.socialapi.publication.exposition.payload.request.*;
 import com.gitter.socialapi.publication.exposition.payload.response.CreatePublicationResponse;
-import com.gitter.socialapi.publication.exposition.payload.response.GetPublicationResponse;
-import com.gitter.socialapi.publication.exposition.payload.request.GetUserPublicationRequest;
-import com.gitter.socialapi.publication.exposition.payload.response.GetUserPublicationsResponse;
+import com.gitter.socialapi.publication.exposition.payload.response.RetrieveNewPublicationsResponse;
+import com.gitter.socialapi.publication.exposition.payload.response.RetrievePublicationResponse;
+import com.gitter.socialapi.publication.exposition.payload.request.RetrieveUserPublicationRequest;
+import com.gitter.socialapi.publication.exposition.payload.response.RetrieveUserPublicationsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,12 +32,16 @@ public class PublicationController {
         return ResponseEntity.ok(response);
     }
     @GetMapping("/{id}")
-    public ResponseEntity<GetPublicationResponse> retrievePublicationByID(@PathVariable String id) throws InvalidParameterException {
+    public ResponseEntity<RetrievePublicationResponse> retrievePublicationByID(@PathVariable String id) throws InvalidParameterException {
         return ResponseEntity.ok(publicationService.getPublicationByID(id));
     }
     @GetMapping("/user")
-    public ResponseEntity<GetUserPublicationsResponse> getUserPublications(@RequestBody GetUserPublicationRequest getRequest) throws InvalidParameterException {
-        return ResponseEntity.ok(publicationService.getUserPublications(getRequest.getId()));
+    public ResponseEntity<RetrieveUserPublicationsResponse> retrieveUserPublications(@RequestBody RetrieveUserPublicationRequest getRequest) throws InvalidParameterException {
+        return ResponseEntity.ok(publicationService.getUserPublications(getRequest));
+    }
+    @GetMapping("/news")
+    public ResponseEntity<RetrieveNewPublicationsResponse> retrieveNewPublications(@RequestBody RetrieveNewPublicationsRequest getRequest) {
+        return ResponseEntity.ok(publicationService.getNewPublications(getRequest));
     }
     @PutMapping
     public ResponseEntity<String> updatePublication(@RequestBody UpdatePublicationRequest updateRequest) throws InvalidParameterException {

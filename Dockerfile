@@ -13,6 +13,6 @@ RUN mvn clean package -DskipTests=true
 FROM openjdk:${OPENJDK_TAG}@${OPENJDK_DIGEST} AS java
 
 WORKDIR /usr/src/app
-COPY --from=maven /usr/src/app/target/social-api-0.0.1-SNAPSHOT.jar .
+COPY --from=maven /usr/src/app/target/socialapi-0.0.1-SNAPSHOT.jar .
 
-ENTRYPOINT ["java","-jar","social-api-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java","-jar","socialapi-0.0.1-SNAPSHOT.jar"]

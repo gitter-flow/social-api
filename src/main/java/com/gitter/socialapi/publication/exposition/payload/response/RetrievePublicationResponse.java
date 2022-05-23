@@ -5,7 +5,7 @@ import lombok.Getter;
 import java.util.Set;
 
 @Getter
-public class GetPublicationResponse {
+public class RetrievePublicationResponse {
     private String userURI;
     private String content;
     private String codeURI;
@@ -13,7 +13,7 @@ public class GetPublicationResponse {
     private String parentPublicationURI;
     private Set<String> likedByURIs;
 
-    private GetPublicationResponse(String userURI, String content, String codeURI, String sharedPublicationURI, String parentPublicationURI, Set<String> likedByURIs) {
+    private RetrievePublicationResponse(String userURI, String content, String codeURI, String sharedPublicationURI, String parentPublicationURI, Set<String> likedByURIs) {
         this.userURI = userURI;
         this.content = content;
         this.codeURI = codeURI;
@@ -21,8 +21,8 @@ public class GetPublicationResponse {
         this.parentPublicationURI = parentPublicationURI;
         this.likedByURIs = likedByURIs;
     }
-    public static GetPublicationResponse of(String userURI, String content, String codeURI, String sharedPublicationURI, String parentPublicationURI, Set<String> likedByURIs) {
-        return new GetPublicationResponse(userURI, content,codeURI, sharedPublicationURI, parentPublicationURI, likedByURIs);
+    public static RetrievePublicationResponse of(String userURI, String content, String codeURI, String sharedPublicationURI, String parentPublicationURI, Set<String> likedByURIs) {
+        return new RetrievePublicationResponse(userURI, content,codeURI, sharedPublicationURI, parentPublicationURI, likedByURIs);
     }
     
 }

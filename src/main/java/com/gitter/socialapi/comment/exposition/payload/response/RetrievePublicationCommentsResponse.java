@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import java.util.List;
 
 @AllArgsConstructor
-public class GetPublicationCommentsResponse {
+public class RetrievePublicationCommentsResponse {
     private String username;
     private Long userId;
     private String content;

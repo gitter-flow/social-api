@@ -7,6 +7,6 @@ import java.util.List;
 
 @AllArgsConstructor
 @Getter
-public class GetUserPublicationsResponse {
+public class RetrieveUserPublicationsResponse {
     private List<String> publicationURIs;
 }

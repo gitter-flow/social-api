@@ -6,9 +6,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -36,6 +40,14 @@ public class Code {
     @Column(name="version")
     public List<String> versions =  new ArrayList<>();
 
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Date createdAt = new Date();
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt = LocalDateTime.now();
+    
     public Code(Publication publication, String bucketLocation, CodeType codeType, List<String> versions) {
         this.publication = publication;
         this.bucketLocation = bucketLocation;

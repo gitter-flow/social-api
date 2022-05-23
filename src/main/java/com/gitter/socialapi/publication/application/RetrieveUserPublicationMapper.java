@@ -1,21 +1,21 @@
 package com.gitter.socialapi.publication.application;
 
 import com.gitter.socialapi.publication.domain.Publication;
-import com.gitter.socialapi.user.domain.User;
-import com.gitter.socialapi.publication.exposition.payload.response.GetUserPublicationsResponse;
+import com.gitter.socialapi.publication.exposition.payload.response.RetrieveUserPublicationsResponse;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GetUserPublicationMapper {
+public class RetrieveUserPublicationMapper {
      private final String baseURL;
 
-    public GetUserPublicationMapper(String baseURL) {
+    public RetrieveUserPublicationMapper(String baseURL) {
         this.baseURL = baseURL;
     }
 
-    public GetUserPublicationsResponse getResponse(List<Publication> publicationList) {
-         return new GetUserPublicationsResponse(
+    public RetrieveUserPublicationsResponse getResponse(List<Publication> publicationList) {
+         return new RetrieveUserPublicationsResponse(
                  publicationList.stream().map(
                    p -> String.format("%s/publications/%d", baseURL, p.getId())
            ).collect(Collectors.toList())

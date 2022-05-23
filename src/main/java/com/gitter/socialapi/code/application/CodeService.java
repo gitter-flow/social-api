@@ -4,11 +4,11 @@ import com.gitter.socialapi.code.domain.Code;
 import com.gitter.socialapi.code.exposition.payload.request.AddVersionCodeRequest;
 import com.gitter.socialapi.code.exposition.payload.request.CreateCodeRequest;
 import com.gitter.socialapi.code.exposition.payload.request.DeleteCodeRequest;
-import com.gitter.socialapi.code.exposition.payload.request.GetVersionCodeRequest;
+import com.gitter.socialapi.code.exposition.payload.request.RetrieveVersionCodeRequest;
 import com.gitter.socialapi.code.exposition.payload.response.AddVersionCodeResponse;
 import com.gitter.socialapi.code.exposition.payload.response.CreateCodeResponse;
-import com.gitter.socialapi.code.exposition.payload.response.GetCodeResponse;
-import com.gitter.socialapi.code.exposition.payload.response.GetCodeVersionsResponse;
+import com.gitter.socialapi.code.exposition.payload.response.RetrieveCodeResponse;
+import com.gitter.socialapi.code.exposition.payload.response.RetrieveCodeVersionsResponse;
 import com.gitter.socialapi.code.infrastructure.CodeRepository;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.kernel.exceptions.InvalidTypeCodeException;
@@ -69,9 +69,9 @@ public class CodeService {
         return CreateCodeMapper.getResponse(code);
     }
     
-    public GetCodeResponse getCodeFromId(String id) throws InvalidParameterException {
+    public RetrieveCodeResponse getCodeFromId(String id) throws InvalidParameterException {
         Code code = getCodeFromIdString(id);
-        GetCodeMapper mapper = new GetCodeMapper(baseURL);
+        RetrieveCodeMapper mapper = new RetrieveCodeMapper(baseURL);
         return mapper.getResponse(code);
     }
     public AddVersionCodeResponse addVersion(AddVersionCodeRequest addVersionCodeRequest) throws InvalidParameterException {
@@ -82,9 +82,9 @@ public class CodeService {
         return new AddVersionCodeResponse(code.getVersions().get(0));
     }
     
-    public GetCodeVersionsResponse getVersions(GetVersionCodeRequest getVersionCodeRequest) throws InvalidParameterException {
+    public RetrieveCodeVersionsResponse getVersions(RetrieveVersionCodeRequest getVersionCodeRequest) throws InvalidParameterException {
         Code code = getCodeFromIdString(getVersionCodeRequest.getId());
-        return new GetCodeVersionsResponse(code.getVersions());
+        return new RetrieveCodeVersionsResponse(code.getVersions());
     }
 
     public void deleteCode(DeleteCodeRequest deleteCodeRequest) throws InvalidParameterException {

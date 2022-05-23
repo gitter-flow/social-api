@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
-
-@AllArgsConstructor
 @Getter
-public class GetCodeVersionsResponse {
+@AllArgsConstructor
+public class RetrieveCodeResponse {
+    private String publicationURI;
+    private String bucketLocation;
+    private String codeType;
     private List<String> versions;
 }
