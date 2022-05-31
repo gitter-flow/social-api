@@ -3,11 +3,8 @@ package com.gitter.socialapi.publication.exposition;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.publication.application.PublicationService;
 import com.gitter.socialapi.publication.exposition.payload.request.*;
-import com.gitter.socialapi.publication.exposition.payload.response.CreatePublicationResponse;
-import com.gitter.socialapi.publication.exposition.payload.response.RetrieveNewPublicationsResponse;
-import com.gitter.socialapi.publication.exposition.payload.response.RetrievePublicationResponse;
+import com.gitter.socialapi.publication.exposition.payload.response.*;
 import com.gitter.socialapi.publication.exposition.payload.request.RetrieveUserPublicationRequest;
-import com.gitter.socialapi.publication.exposition.payload.response.RetrieveUserPublicationsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +31,10 @@ public class PublicationController {
     @GetMapping("/{id}")
     public ResponseEntity<RetrievePublicationResponse> retrievePublicationByID(@PathVariable String id) throws InvalidParameterException {
         return ResponseEntity.ok(publicationService.getPublicationByID(id));
+    }
+    @GetMapping
+    public ResponseEntity<RetrieveAllPublicationsResponse> retrieveAllPublications(@RequestBody RetrieveAllPublicationsRequest getRequest) {
+        return ResponseEntity.ok(publicationService.getAll(getRequest));
     }
     @GetMapping("/user")
     public ResponseEntity<RetrieveUserPublicationsResponse> retrieveUserPublications(@RequestBody RetrieveUserPublicationRequest getRequest) throws InvalidParameterException {

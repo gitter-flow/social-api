@@ -3,5 +3,6 @@
 Run a POSTGRES container with:
 
 ```
-docker run -d  -p 5432:5432  --name postgres -e POSTGRES_DB=api_social -e POSTGRES_PASSWORD=password  -e POSTGRES_USER=user -e PGDATA=/var/lib/postgresql/data/pgdata  postgres
+docker run -d  -p 5432:5432  --name postgres -e POSTGRES_DB=gitter -e POSTGRES_PASSWORD=gitter123  -e POSTGRES_USER=gitter -e PGDATA=/var/lib/postgresql/data/pgdata  postgres
 ```
+

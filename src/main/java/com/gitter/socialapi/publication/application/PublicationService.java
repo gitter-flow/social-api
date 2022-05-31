@@ -6,10 +6,7 @@ import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.kernel.exceptions.NoSuchEntityException;
 import com.gitter.socialapi.publication.domain.Publication;
 import com.gitter.socialapi.publication.exposition.payload.request.*;
-import com.gitter.socialapi.publication.exposition.payload.response.CreatePublicationResponse;
-import com.gitter.socialapi.publication.exposition.payload.response.RetrieveNewPublicationsResponse;
-import com.gitter.socialapi.publication.exposition.payload.response.RetrievePublicationResponse;
-import com.gitter.socialapi.publication.exposition.payload.response.RetrieveUserPublicationsResponse;
+import com.gitter.socialapi.publication.exposition.payload.response.*;
 import com.gitter.socialapi.publication.infrastructure.PublicationRepository;
 import com.gitter.socialapi.user.application.UserService;
 import com.gitter.socialapi.user.domain.User;
@@ -22,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 
 @Service
@@ -91,6 +87,12 @@ public class PublicationService {
         Publication publication = getPublicationFromIdString(id);
         RetrievePublicationMapper mapper = new RetrievePublicationMapper(baseURL);
         return mapper.toResponse(publication);
+    }
+
+    public RetrieveAllPublicationsResponse getAll(RetrieveAllPublicationsRequest getRequest) {
+        Page<Publication> publicationList = publicationRepository.findAll(PageRequest.of(getRequest.getPageNumber(), getRequest.getNumberPerPage()));
+        RetrieveAllPublicationsMapper mapper = new RetrieveAllPublicationsMapper(baseURL);
+        return mapper.toResponse(publicationList);
     }
     public RetrieveUserPublicationsResponse getUserPublications(RetrieveUserPublicationRequest getRequest) throws InvalidParameterException {
         RetrieveUserPublicationMapper mapper = new RetrieveUserPublicationMapper(baseURL);

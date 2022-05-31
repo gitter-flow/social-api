@@ -2,7 +2,6 @@ package com.gitter.socialapi.publication.application;
 
 import com.gitter.socialapi.publication.domain.Publication;
 import com.gitter.socialapi.publication.exposition.payload.response.RetrieveUserPublicationsResponse;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,7 +16,7 @@ public class RetrieveUserPublicationMapper {
     public RetrieveUserPublicationsResponse getResponse(List<Publication> publicationList) {
          return new RetrieveUserPublicationsResponse(
                  publicationList.stream().map(
-                   p -> String.format("%s/publications/%d", baseURL, p.getId())
+                   p -> String.format("%s/publication/%d", baseURL, p.getId())
            ).collect(Collectors.toList())
          );
      }

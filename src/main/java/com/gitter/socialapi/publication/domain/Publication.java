@@ -19,6 +19,7 @@ import java.util.Set;
 @Entity(name = "publication")
 @AllArgsConstructor
 @NoArgsConstructor
+@Setter
 public class Publication {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
