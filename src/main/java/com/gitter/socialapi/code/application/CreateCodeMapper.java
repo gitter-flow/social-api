@@ -4,16 +4,15 @@ import com.gitter.socialapi.code.domain.Code;
 import com.gitter.socialapi.code.exposition.payload.request.CreateCodeRequest;
 import com.gitter.socialapi.code.exposition.payload.response.CreateCodeResponse;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
-import com.gitter.socialapi.kernel.exceptions.InvalidTypeCodeException;
+import com.gitter.socialapi.kernel.exceptions.InvalidCodeTypeException;
 import com.gitter.socialapi.kernel.utils.DateGenerator;
 import com.gitter.socialapi.publication.domain.Publication;
-import com.gitter.socialapi.publication.domain.CodeType;
+import com.gitter.socialapi.code.domain.CodeType;
 
 import java.util.List;
 
 public class CreateCodeMapper {
-
-    public static Code toCode(CreateCodeRequest codeRequest, Publication publication) throws InvalidParameterException, InvalidTypeCodeException {
+    public static Code toCode(CreateCodeRequest codeRequest, Publication publication) throws InvalidParameterException, InvalidCodeTypeException {
         DateGenerator date = new DateGenerator();
         CodeType codeType = CodeType.fromString(codeRequest.getCodeType());
         return new Code(

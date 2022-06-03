@@ -10,7 +10,7 @@ import com.gitter.socialapi.code.exposition.payload.response.CreateCodeResponse;
 import com.gitter.socialapi.code.exposition.payload.response.RetrieveCodeResponse;
 import com.gitter.socialapi.code.exposition.payload.response.RetrieveCodeVersionsResponse;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
-import com.gitter.socialapi.kernel.exceptions.InvalidTypeCodeException;
+import com.gitter.socialapi.kernel.exceptions.InvalidCodeTypeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,10 +30,10 @@ public class CodeController {
     }
     
     @PostMapping
-    public ResponseEntity<CreateCodeResponse> createCode(@RequestBody CreateCodeRequest code) throws InvalidParameterException, InvalidTypeCodeException {
+    public ResponseEntity<CreateCodeResponse> createCode(@RequestBody CreateCodeRequest code) throws InvalidParameterException, InvalidCodeTypeException {
         return ResponseEntity.ok(codeService.createCode(code));
     }
-    @PutMapping
+    @PutMapping("/run")
     public AddVersionCodeResponse addVersion(@RequestBody AddVersionCodeRequest addVersionCodeRequest) throws InvalidParameterException {
         return codeService.addVersion(addVersionCodeRequest);
     }

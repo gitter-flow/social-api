@@ -4,12 +4,12 @@ import lombok.Getter;
 
 @Getter
 public class CreatePublicationResponse {
-    private Long id;
+    private String id;
 
-    private CreatePublicationResponse(Long id) {
+    private CreatePublicationResponse(String id) {
         this.id = id;
     }
-    public static CreatePublicationResponse of(Long id) {
+    public static CreatePublicationResponse of(String id) {
         return new CreatePublicationResponse(id);
     }
 }

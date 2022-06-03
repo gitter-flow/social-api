@@ -2,27 +2,27 @@ package com.gitter.socialapi.publication.exposition.payload.response;
 
 import lombok.Getter;
 
-import java.util.Set;
+import java.util.List;
 
 @Getter
 public class RetrievePublicationResponse {
-    private String userURI;
+    private String userId;
     private String content;
-    private String codeURI;
-    private String sharedPublicationURI;
-    private String parentPublicationURI;
-    private Set<String> likedByURIs;
+    private String codeId;
+    private String sharedPublicationId;
+    private String parentPublicationId;
+    private List<String> likes;
 
-    private RetrievePublicationResponse(String userURI, String content, String codeURI, String sharedPublicationURI, String parentPublicationURI, Set<String> likedByURIs) {
-        this.userURI = userURI;
+    private RetrievePublicationResponse(String userId, String content, String codeId, String sharedPublicationId, String parentPublicationId, List<String> likes) {
+        this.userId = userId;
         this.content = content;
-        this.codeURI = codeURI;
-        this.sharedPublicationURI = sharedPublicationURI;
-        this.parentPublicationURI = parentPublicationURI;
-        this.likedByURIs = likedByURIs;
+        this.codeId = codeId;
+        this.sharedPublicationId = sharedPublicationId;
+        this.parentPublicationId = parentPublicationId;
+        this.likes = likes;
     }
-    public static RetrievePublicationResponse of(String userURI, String content, String codeURI, String sharedPublicationURI, String parentPublicationURI, Set<String> likedByURIs) {
-        return new RetrievePublicationResponse(userURI, content,codeURI, sharedPublicationURI, parentPublicationURI, likedByURIs);
+    public static RetrievePublicationResponse of(String userId, String content, String codeId, String sharedPublicationId, String parentPublicationId, List<String> likes) {
+        return new RetrievePublicationResponse(userId, content, codeId, sharedPublicationId, parentPublicationId, likes);
     }
     
 }

@@ -5,7 +5,7 @@ public class NoSuchEntityException extends RuntimeException {
         super(message);
     }
 
-    public static NoSuchEntityException withId(String entityName, Long id) {
+    public static NoSuchEntityException withId(String entityName, String id) {
         return new NoSuchEntityException(String.format("No %s found with ID %d.", entityName, id));
     }
 }

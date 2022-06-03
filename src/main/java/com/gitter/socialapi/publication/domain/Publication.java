@@ -14,17 +14,18 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Data
 @Entity(name = "publication")
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
+@Getter
 public class Publication {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private String id = UUID.randomUUID().toString();
 
     @ManyToOne
     @JoinColumn(name="user_id", nullable = false)
@@ -35,9 +36,9 @@ public class Publication {
     @Column(name = "disabled")
     private Boolean disabled = false;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="code_id")
-    @Nullable
+    @OneToOne(mappedBy = "publication", cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER)
+    @JoinColumn(name = "code_id")
     private Code code;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.ALL, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST })
@@ -49,7 +50,7 @@ public class Publication {
     private Publication parentPublication;
     
     @ManyToMany(fetch = FetchType.LAZY)
-    private Set<User> likedBy;
+    private List<User> likedBy;
 
     @OneToMany(fetch = FetchType.LAZY, targetEntity = Publication.class, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;

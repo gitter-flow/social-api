@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class RetrievePublicationCommentsRequest {
-    private Long id;
+    private String publicationId;
     private Integer pageNumber;
     private Integer numberPerPages;
 }

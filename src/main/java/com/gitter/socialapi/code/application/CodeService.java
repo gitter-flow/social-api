@@ -11,7 +11,7 @@ import com.gitter.socialapi.code.exposition.payload.response.RetrieveCodeRespons
 import com.gitter.socialapi.code.exposition.payload.response.RetrieveCodeVersionsResponse;
 import com.gitter.socialapi.code.infrastructure.CodeRepository;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
-import com.gitter.socialapi.kernel.exceptions.InvalidTypeCodeException;
+import com.gitter.socialapi.kernel.exceptions.InvalidCodeTypeException;
 import com.gitter.socialapi.kernel.exceptions.NoSuchEntityException;
 import com.gitter.socialapi.kernel.utils.DateGenerator;
 import com.gitter.socialapi.publication.domain.Publication;
@@ -35,26 +35,14 @@ public class CodeService {
         this.publicationRepository = publicationRepository;
         this.baseURL = baseURL;
     }
-    
-    private static Long getIdFromString(String idStr) throws InvalidParameterException {
-        long id;
-        try {
-            id = Long.parseLong(idStr);
-        } catch (NumberFormatException nfe) {
-            throw InvalidParameterException.forField("id", idStr);
-        }
-        return id;
-    }
-    public Code getCodeFromIdString(String idStr) throws InvalidParameterException {
-        Long id = getIdFromString(idStr);
+    public Code getCodeFromIdString(String id) throws InvalidParameterException {
         Optional<Code> code = codeRepository.findById(id);
         if(code.isEmpty()){
             throw NoSuchEntityException.withId(org.aspectj.apache.bcel.classfile.Code.class.getSimpleName(), id);
         }
         return code.get();
     }
-    public Publication getPublicationFromIdString(String idStr) throws InvalidParameterException {
-        Long id = getIdFromString(idStr);
+    public Publication getPublicationFromIdString(String id) throws InvalidParameterException {
         Optional<Publication> publication = publicationRepository.findById(id);
 
         if(publication.isEmpty()){
@@ -63,7 +51,7 @@ public class CodeService {
         return publication.get();
     }
     
-    public CreateCodeResponse createCode(CreateCodeRequest codeRequest) throws InvalidParameterException, InvalidTypeCodeException {
+    public CreateCodeResponse createCode(CreateCodeRequest codeRequest) throws InvalidParameterException, InvalidCodeTypeException {
         Publication publication = getPublicationFromIdString(codeRequest.getPublicationId());
         Code code = codeRepository.save(CreateCodeMapper.toCode(codeRequest, publication));
         return CreateCodeMapper.getResponse(code);

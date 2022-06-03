@@ -1,11 +1,7 @@
 package com.gitter.socialapi.code.domain;
 
 import com.gitter.socialapi.publication.domain.Publication;
-import com.gitter.socialapi.publication.domain.CodeType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -14,20 +10,22 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
+@Getter
 @Entity(name = "code")
 public class Code {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private String id = UUID.randomUUID().toString();
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="publication_id")
+    @OneToOne
+    @JoinColumn(name = "publication_id")
+    @EqualsAndHashCode.Exclude
     private Publication publication;
 
     private String bucketLocation;
@@ -47,7 +45,6 @@ public class Code {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
-    
     public Code(Publication publication, String bucketLocation, CodeType codeType, List<String> versions) {
         this.publication = publication;
         this.bucketLocation = bucketLocation;

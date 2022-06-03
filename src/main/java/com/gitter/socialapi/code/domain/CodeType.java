@@ -1,7 +1,7 @@
-package com.gitter.socialapi.publication.domain;
+package com.gitter.socialapi.code.domain;
 
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
-import com.gitter.socialapi.kernel.exceptions.InvalidTypeCodeException;
+import com.gitter.socialapi.kernel.exceptions.InvalidCodeTypeException;
 
 public enum CodeType {
     C("c"),
@@ -21,6 +21,6 @@ public enum CodeType {
                 return b;
             }
         }
-        throw InvalidTypeCodeException.withValue(text);
+        throw InvalidCodeTypeException.withValue(text);
     }
 }

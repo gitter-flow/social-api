@@ -8,11 +8,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
-public interface CommentRepository extends JpaRepository<Comment, Long> {
+public interface CommentRepository extends JpaRepository<Comment, String> {
     
     @Query(
             value = "select c from comment c where c.publication.id = :id"
     )
-    Page<Comment> selectWherePublicationIdEquals(@Param("id") Long id, Pageable pageable);
+    List<Comment> selectWherePublicationIdEquals(@Param("id") String id, Pageable pageable);
 }

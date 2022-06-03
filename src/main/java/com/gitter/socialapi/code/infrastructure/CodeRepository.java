@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CodeRepository extends JpaRepository<Code, Long> {
+public interface CodeRepository extends JpaRepository<Code, String> {
 
     List<Code> findAll();
 }

@@ -8,5 +8,11 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class RetrieveAllPublicationsResponse {
-    private List<String> publicationURIs;
+    private String username;
+    private String userId;
+    private String content;
+    private String codeId;
+    private String sharedPublicationId;
+    private String parentPublicationId;
+    private List<String> likes;
 }

@@ -1,7 +1,7 @@
 package com.gitter.socialapi;
 
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
-import com.gitter.socialapi.kernel.exceptions.InvalidTypeCodeException;
+import com.gitter.socialapi.kernel.exceptions.InvalidCodeTypeException;
 import com.gitter.socialapi.kernel.exceptions.NoSuchEntityException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +17,8 @@ public class ExceptionController {
     public ResponseEntity<Object> invalidEntryException(InvalidParameterException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
-    @ExceptionHandler(value = InvalidTypeCodeException.class)
-    public ResponseEntity<Object> invalidTypeCodeException(InvalidTypeCodeException exception) {
+    @ExceptionHandler(value = InvalidCodeTypeException.class)
+    public ResponseEntity<Object> invalidTypeCodeException(InvalidCodeTypeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

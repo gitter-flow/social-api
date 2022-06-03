@@ -18,9 +18,9 @@ import java.util.*;
 @Entity(name="users")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private String id = UUID.randomUUID().toString();
+    
     @Column(name = "keycloak_id", nullable = false, unique = true)
     private String keycloakId;
     

@@ -12,11 +12,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PublicationRepository extends JpaRepository<Publication, Long> {
+public interface PublicationRepository extends JpaRepository<Publication, String> {
     @Query(
             value = "select p from publication p where p.user.id = :id order by p.createdAt desc"
     )
-    List<Publication> selectWhereUserIdEquals(@Param("id") Long id, Pageable pageable);
+    List<Publication> selectWhereUserIdEquals(@Param("id") String id, Pageable pageable);
 
     @Query(
             value = """
@@ -26,7 +26,7 @@ public interface PublicationRepository extends JpaRepository<Publication, Long> 
                 order by p.createdAt desc
                 """
     )
-    List<Publication> selectWhereUserFollows(@Param("id") Long id, Pageable pageable);
+    List<Publication> selectWhereUserFollows(@Param("id") String id, Pageable pageable);
 
     @Modifying
     @Query(
@@ -35,6 +35,6 @@ public interface PublicationRepository extends JpaRepository<Publication, Long> 
                 where p.id = :id
                 """
     )
-    void deleteById(@Param("id") @NonNull Long id);
+    void deleteById(@Param("id") @NonNull String id);
     
 }

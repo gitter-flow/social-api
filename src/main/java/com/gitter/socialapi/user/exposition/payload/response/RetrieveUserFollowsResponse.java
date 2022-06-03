@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class RetrieveUserFollowsResponse {
-    private Long userId;
+    private String userId;
     private String username;
     private String userURL;
 }

@@ -10,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(
         value = "/publication",
@@ -33,15 +35,15 @@ public class PublicationController {
         return ResponseEntity.ok(publicationService.getPublicationByID(id));
     }
     @GetMapping
-    public ResponseEntity<RetrieveAllPublicationsResponse> retrieveAllPublications(@RequestBody RetrieveAllPublicationsRequest getRequest) {
+    public ResponseEntity<List<RetrieveAllPublicationsResponse>> retrieveAllPublications(@RequestBody RetrieveAllPublicationsRequest getRequest) {
         return ResponseEntity.ok(publicationService.getAll(getRequest));
     }
     @GetMapping("/user")
-    public ResponseEntity<RetrieveUserPublicationsResponse> retrieveUserPublications(@RequestBody RetrieveUserPublicationRequest getRequest) throws InvalidParameterException {
+    public ResponseEntity<List<RetrieveUserPublicationsResponse>> retrieveUserPublications(@RequestBody RetrieveUserPublicationRequest getRequest) throws InvalidParameterException {
         return ResponseEntity.ok(publicationService.getUserPublications(getRequest));
     }
     @GetMapping("/news")
-    public ResponseEntity<RetrieveNewPublicationsResponse> retrieveNewPublications(@RequestBody RetrieveNewPublicationsRequest getRequest) {
+    public ResponseEntity<List<RetrieveNewPublicationsResponse>> retrieveNewPublications(@RequestBody RetrieveNewPublicationsRequest getRequest) {
         return ResponseEntity.ok(publicationService.getNewPublications(getRequest));
     }
     @PutMapping

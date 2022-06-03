@@ -13,7 +13,6 @@ import com.gitter.socialapi.user.domain.User;
 import com.gitter.socialapi.user.infrastructure.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -38,18 +37,7 @@ public class CommentService {
         this.publicationService = publicationService;
         this.baseURL = baseURL;
     }
-
-    private Long getIdToLong(String idStr) throws InvalidParameterException {
-        long id;
-        try {
-            id = Long.parseLong(idStr);
-        } catch (NumberFormatException nfe) {
-            throw InvalidParameterException.forField("id", idStr);
-        }
-        return id;
-    }
-    public Comment getCommentFromIdString(String idStr) throws InvalidParameterException {
-        Long id = getIdToLong(idStr);
+    public Comment getCommentFromIdString(String id) throws InvalidParameterException {
         Optional<Comment> comment = commentRepository.findById(id);
         if(comment.isEmpty()){
             throw NoSuchEntityException.withId(Publication.class.getSimpleName(), id);
@@ -72,7 +60,7 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-    public void deleteComment(Long id){
+    public void deleteComment(String id){
         Optional<Comment> commentFound = commentRepository.findById(id);
         if(commentFound.isPresent()){
             commentRepository.delete(commentFound.get());
@@ -95,22 +83,19 @@ public class CommentService {
         comment.getLikedBy().remove(user);
         commentRepository.save(comment);
     }
-
     public void updateContentComment(UpdateCommentRequest updateCommentRequest) throws InvalidParameterException {
         Comment comment = getCommentFromIdString(updateCommentRequest.getId());
         comment.setContent(updateCommentRequest.getContent());
         commentRepository.save(comment);
     }
-    
     public List<RetrievePublicationCommentsResponse> getCommentPublication(RetrievePublicationCommentsRequest getPublicationCommentRequest) {
-        Page<Comment> comments = commentRepository.selectWherePublicationIdEquals(
-                getPublicationCommentRequest.getId(), 
+        List<Comment> comments = commentRepository.selectWherePublicationIdEquals(
+                getPublicationCommentRequest.getPublicationId(), 
                 PageRequest.of(
                         getPublicationCommentRequest.getPageNumber(), 
                         getPublicationCommentRequest.getNumberPerPages()
                 )
         );
-        RetrievePublicationCommentsMapper mapper = new RetrievePublicationCommentsMapper(baseURL);
-        return mapper.toResponse(comments);
+        return RetrievePublicationCommentsMapper.toResponse(comments);
     }
 }

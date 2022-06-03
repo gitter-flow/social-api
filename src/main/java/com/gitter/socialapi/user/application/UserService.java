@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -35,13 +36,7 @@ public class UserService {
         this.baseURL = baseURL;
     }
 
-    public User getUserFromStringId(String idStr) throws InvalidParameterException {
-        long id;
-        try {
-            id = Long.parseLong(idStr);
-        } catch (NumberFormatException nfe) {
-            throw InvalidParameterException.forField("id", idStr);
-        }
+    public User getUserFromStringId(String id) throws InvalidParameterException {
         Optional<User> user = userRepository.findById(id);
         if(user.isEmpty()){
             throw NoSuchEntityException.withId(User.class.getSimpleName(), id);
@@ -93,14 +88,9 @@ public class UserService {
     }
     public void unfollow(UpdateUnfollowUserRequest updateUnfollowUserRequest) throws InvalidParameterException {
         User user = getUserFromStringId(updateUnfollowUserRequest.getUserId());
-        long id;
-        try {
-            id = Long.parseLong(updateUnfollowUserRequest.getUserToUnfollowId());
-        } catch (NumberFormatException nfe) {
-            throw InvalidParameterException.forField("id", updateUnfollowUserRequest.getUserToUnfollowId());
-        }
+
         List<User> newFollows = user.getFollows().stream()
-                .filter(u -> u.getId() != id)
+                .filter(u -> !Objects.equals(u.getId(), updateUnfollowUserRequest.getUserId()))
                 .collect(Collectors.toList());
         user.setFollows(newFollows);
         userRepository.save(user);

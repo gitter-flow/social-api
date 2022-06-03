@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +26,6 @@ public class PublicationService {
     private final PublicationRepository publicationRepository;
     private final UserService userService;
     private final CodeService codeService;
-    
     private final String baseURL;
 
     @Autowired
@@ -42,22 +40,11 @@ public class PublicationService {
         this.baseURL = baseURL;
     }
     
-    
-    private Long getIdToLong(String idStr) throws InvalidParameterException {
-        long id;
-        try {
-            id = Long.parseLong(idStr);
-        } catch (NumberFormatException nfe) {
-            throw InvalidParameterException.forField("id", idStr);
-        }
-        return id;
-    }
     public Publication getPublicationFromIdString(String idStr) throws InvalidParameterException {
-        Long id = getIdToLong(idStr);
-        Optional<Publication> publication = publicationRepository.findById(id);
+        Optional<Publication> publication = publicationRepository.findById(idStr);
 
         if(publication.isEmpty()){
-            throw NoSuchEntityException.withId(Publication.class.getSimpleName(), id);
+            throw NoSuchEntityException.withId(Publication.class.getSimpleName(), idStr);
         }
         return publication.get();
     }
@@ -85,20 +72,20 @@ public class PublicationService {
     }
     public RetrievePublicationResponse getPublicationByID(String id) throws InvalidParameterException {
         Publication publication = getPublicationFromIdString(id);
-        RetrievePublicationMapper mapper = new RetrievePublicationMapper(baseURL);
-        return mapper.toResponse(publication);
+        return RetrievePublicationMapper.toResponse(publication);
     }
-
-    public RetrieveAllPublicationsResponse getAll(RetrieveAllPublicationsRequest getRequest) {
+    public List<RetrieveAllPublicationsResponse> getAll(RetrieveAllPublicationsRequest getRequest) {
         Page<Publication> publicationList = publicationRepository.findAll(PageRequest.of(getRequest.getPageNumber(), getRequest.getNumberPerPage()));
-        RetrieveAllPublicationsMapper mapper = new RetrieveAllPublicationsMapper(baseURL);
-        return mapper.toResponse(publicationList);
+        return RetrieveAllPublicationsMapper.toResponse(publicationList); 
     }
-    public RetrieveUserPublicationsResponse getUserPublications(RetrieveUserPublicationRequest getRequest) throws InvalidParameterException {
-        RetrieveUserPublicationMapper mapper = new RetrieveUserPublicationMapper(baseURL);
+    public List<RetrieveUserPublicationsResponse> getUserPublications(RetrieveUserPublicationRequest getRequest) throws InvalidParameterException {
         PageRequest page = PageRequest.of(getRequest.getPageNumber(), getRequest.getNumberPerPage());
-        List<Publication> publicationList = publicationRepository.selectWhereUserIdEquals(getIdToLong(getRequest.getId()), page);
-        return mapper.getResponse(publicationList);
+        List<Publication> publicationList = publicationRepository.selectWhereUserIdEquals(getRequest.getId(), page);
+        return RetrieveUserPublicationMapper.getResponse(publicationList);
+    }
+    public List<RetrieveNewPublicationsResponse> getNewPublications(RetrieveNewPublicationsRequest getRequest) {
+        List<Publication> publications = new ArrayList<>(publicationRepository.selectWhereUserFollows(getRequest.getUserId(), PageRequest.of(getRequest.getPageNumber(), getRequest.getNumberPerPage())));
+        return RetrieveNewPublicationsMapper.toResponse(publications);
     }
     public void updatePublication(UpdatePublicationRequest updateRequest) throws InvalidParameterException {
         Publication publication = getPublicationFromIdString(updateRequest.getId());
@@ -110,12 +97,6 @@ public class PublicationService {
             publication.setCode(code);
         }
         publicationRepository.save(publication);
-    }
-    
-    public RetrieveNewPublicationsResponse getNewPublications(RetrieveNewPublicationsRequest getRequest) {
-        List<Publication> publications = new ArrayList<>(publicationRepository.selectWhereUserFollows(getRequest.getUserId(), PageRequest.of(getRequest.getPageNumber(), getRequest.getNumberPerPage())));
-        RetrieveNewPublicationsMapper mapper = new RetrieveNewPublicationsMapper(baseURL);
-        return mapper.toResponse(publications);
     }
     public void likePublication(UpdateLikePublicationRequest likePublicationRequest) throws InvalidParameterException {
         Publication publication = getPublicationFromIdString(likePublicationRequest.getPublicationId());
