@@ -11,6 +11,7 @@ public class RetrieveNewPublicationsMapper {
     public static List<RetrieveNewPublicationsResponse> toResponse(List<Publication> publicationList) {
         return publicationList.stream().map(
                         p -> new RetrieveNewPublicationsResponse(
+                                p.getId(),
                                 p.getUser().getUsername(),
                                 p.getUser().getId(),
                                 p.getContent(),

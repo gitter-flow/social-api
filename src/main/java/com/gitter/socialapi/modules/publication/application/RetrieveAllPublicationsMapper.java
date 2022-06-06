@@ -12,6 +12,7 @@ public class RetrieveAllPublicationsMapper {
     public static List<RetrieveAllPublicationsResponse> toResponse(Page<Publication> publications) {
         return publications.get().map(
                         p -> new RetrieveAllPublicationsResponse(
+                                p.getId(),
                                 p.getUser().getUsername(),
                                 p.getUser().getId(),
                                 p.getContent(),

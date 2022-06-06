@@ -8,6 +8,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class RetrieveAllPublicationsResponse {
+    private String id;
     private String username;
     private String userId;
     private String content;
