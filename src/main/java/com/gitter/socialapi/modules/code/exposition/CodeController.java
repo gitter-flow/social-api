@@ -11,9 +11,11 @@ import com.gitter.socialapi.modules.code.exposition.payload.response.RetrieveCod
 import com.gitter.socialapi.modules.code.exposition.payload.response.RetrieveCodeVersionsResponse;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.kernel.exceptions.InvalidCodeTypeException;
+import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -30,7 +32,8 @@ public class CodeController {
     }
     
     @PostMapping
-    public ResponseEntity<CreateCodeResponse> createCode(@RequestBody CreateCodeRequest code) throws InvalidParameterException, InvalidCodeTypeException {
+    @PreAuthorize("@authService.tokenIsValidForPublicationWithId(#code.publicationId, #authentication)")
+    public ResponseEntity<CreateCodeResponse> createCode(@RequestBody CreateCodeRequest code, KeycloakAuthenticationToken authentication) throws InvalidParameterException, InvalidCodeTypeException {
         return ResponseEntity.ok(codeService.createCode(code));
     }
     @PutMapping("/run")
@@ -47,7 +50,8 @@ public class CodeController {
        return ResponseEntity.ok(versions);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteCode(@RequestBody DeleteCodeRequest deleteCodeRequest) throws InvalidParameterException {
+    @PreAuthorize("@authService.tokenIsValidForCodeWithId(#deleteCodeRequest.id, #authentication)")
+    public ResponseEntity<String> deleteCode(@RequestBody DeleteCodeRequest deleteCodeRequest, KeycloakAuthenticationToken authentication) throws InvalidParameterException {
         codeService.deleteCode(deleteCodeRequest);
         return ResponseEntity.ok(String.format("Code %s successfully deleted", deleteCodeRequest.getId()));
     }

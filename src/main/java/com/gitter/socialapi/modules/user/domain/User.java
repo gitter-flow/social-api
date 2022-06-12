@@ -15,18 +15,16 @@ import java.util.*;
 @Entity(name="users")
 public class User {
     @Id
-    @Column(name = "id", nullable = false)
-    private String id = UUID.randomUUID().toString();
-    
-    @Column(name = "keycloak_id", nullable = false, unique = true)
-    private String keycloakId;
-    
+    @Column(name = "id", nullable = false, unique = true)
+    private String id;
     @Column(name = "username", nullable = false, unique = true)
     private String username;
     private String firstName;
     private String lastName;
     @Column(name = "email", nullable = false, unique = true)
     private String email;
+    
+    @Column(name= "description")
     private String description;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -55,13 +53,20 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
     
-    public User(String keycloakId, String username, String description, String firstName, String lastName, String email) {
-        this.keycloakId = keycloakId;
+    public User(String id, String username, String description, String firstName, String lastName, String email) {
+        this.id = id;
         this.username = username;
         this.description = description;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;        
+    }
+    public User(String id, String username, String firstName, String lastName, String email) {
+        this.id = id;
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
     }
     public void addNewPublication(Publication publication) {
         this.publications.add(publication);

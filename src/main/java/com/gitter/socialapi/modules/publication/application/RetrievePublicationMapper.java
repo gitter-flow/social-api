@@ -8,11 +8,10 @@ import java.util.stream.Collectors;
 
 public class RetrievePublicationMapper {
     public static RetrievePublicationResponse toResponse(Publication publication) {
-
         return RetrievePublicationResponse.of(
                 publication.getUser().getId(),
                 publication.getContent(),
-                publication.getCode().getId(),
+                publication.getCode() != null? publication.getCode() .getId() : null,
                 publication.getSharedPublication() != null ? publication.getSharedPublication().getId() : null,
                 publication.getParentPublication() != null ? publication.getParentPublication().getId() : null,
                 publication.getLikedBy().stream()

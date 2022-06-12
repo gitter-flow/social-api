@@ -9,7 +9,6 @@ public class RetrieveUserMapper {
     public static RetrieveUserByIdResponse toGetUserByIdResponse(User user) {
         return RetrieveUserByIdResponse.of(
                 user.getId(),
-                user.getKeycloakId(), 
                 user.getUsername(),
                 user.getFollowedBy().size(),
                 user.getFollows().size());

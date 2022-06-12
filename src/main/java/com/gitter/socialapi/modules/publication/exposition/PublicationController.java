@@ -1,13 +1,18 @@
 package com.gitter.socialapi.modules.publication.exposition;
 
+import com.gitter.socialapi.auth.AuthService;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.modules.publication.application.PublicationService;
 import com.gitter.socialapi.modules.publication.exposition.payload.request.*;
 import com.gitter.socialapi.modules.publication.exposition.payload.response.*;
 import com.gitter.socialapi.modules.publication.exposition.payload.request.RetrieveUserPublicationRequest;
+import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,13 +25,18 @@ import java.util.List;
 )
 public class PublicationController {
     private PublicationService publicationService;
+    
+    private AuthService authService;
+    
     @Autowired
-    PublicationController(PublicationService publicationService) {
+    PublicationController(PublicationService publicationService, AuthService authService) {
         this.publicationService = publicationService;
+        this.authService = authService;
     }
 
     @PostMapping
-    public ResponseEntity<CreatePublicationResponse> createPublication(@RequestBody CreatePublicationRequest createPublicationRequest) throws InvalidParameterException {
+    @PreAuthorize("@authService.tokenIsValidForUserWithId(#createPublicationRequest.userId, #authentication)")
+    public ResponseEntity<CreatePublicationResponse> createPublication(@RequestBody CreatePublicationRequest createPublicationRequest, KeycloakAuthenticationToken authentication) throws InvalidParameterException {
         CreatePublicationResponse response = publicationService.createPublication(createPublicationRequest);
         return ResponseEntity.ok(response);
     }
@@ -70,12 +80,14 @@ public class PublicationController {
         return ResponseEntity.ok(publicationService.getNewPublications(getRequest));
     }
     @PutMapping
-    public ResponseEntity<String> updatePublication(@RequestBody UpdatePublicationRequest updateRequest) throws InvalidParameterException {
+    @PreAuthorize("@authService.tokenIsValidForPublicationWithId(#updateRequest.id, #authentication)")
+    public ResponseEntity<String> updatePublication(@RequestBody UpdatePublicationRequest updateRequest, KeycloakAuthenticationToken authentication) throws InvalidParameterException {
         publicationService.updatePublication(updateRequest);
         return ResponseEntity.ok(String.format("Publication %s updated", updateRequest.getId()));
     }
     @PostMapping("/like")
-    public ResponseEntity<String> likePublication(@RequestBody UpdateLikePublicationRequest likePublicationRequest) throws InvalidParameterException {
+    @PreAuthorize("@authService.tokenIsValidForUserWithId(#likePublicationRequest.userId, #authentication)")
+    public ResponseEntity<String> likePublication(@RequestBody UpdateLikePublicationRequest likePublicationRequest,  KeycloakAuthenticationToken authentication) throws InvalidParameterException {
         publicationService.likePublication(likePublicationRequest);
         return ResponseEntity.ok(String.format(
                 "Publication %s liked by user %s",
@@ -83,15 +95,17 @@ public class PublicationController {
                 likePublicationRequest.getUserId()));
     }
     @PostMapping("/unlike")
-    public ResponseEntity<String> unlikePublication(@RequestBody UpdateUnlikePublicationRequest unlikePublicationRequest) throws InvalidParameterException {
-        publicationService.unlikePublication(unlikePublicationRequest);
+    @PreAuthorize("@authService.tokenIsValidForUserWithId(#unlikePublicationRequest.userId, #authentication)")
+    public ResponseEntity<String> unlikePublication(@RequestBody UpdateUnlikePublicationRequest unlikePublicationRequest, KeycloakAuthenticationToken authentication) throws InvalidParameterException {
+         publicationService.unlikePublication(unlikePublicationRequest);
          return ResponseEntity.ok(String.format(
                 "Publication %s liked by user %s",
                  unlikePublicationRequest.getPublicationId(),
                  unlikePublicationRequest.getUserId()));
     }
     @DeleteMapping
-    public ResponseEntity<String> deletePublication(@RequestBody DeletePublicationRequest deletePublicationRequest) throws InvalidParameterException {
+    @PreAuthorize("@authService.tokenIsValidForPublicationWithId(#deletePublicationRequest.id, #authentication)")
+    public ResponseEntity<String> deletePublication(@RequestBody DeletePublicationRequest deletePublicationRequest, KeycloakAuthenticationToken authentication) throws InvalidParameterException {
         publicationService.deletePublication(deletePublicationRequest);
         return ResponseEntity.ok(String.format("Publication %s deleted", deletePublicationRequest.getId()));
     }
