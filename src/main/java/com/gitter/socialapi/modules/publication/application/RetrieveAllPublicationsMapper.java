@@ -16,6 +16,7 @@ public class RetrieveAllPublicationsMapper {
                                 p.getUser().getUsername(),
                                 p.getUser().getId(),
                                 p.getContent(),
+                                p.getCreatedAt().toString(),
                                 p.getCode() != null ? p.getCode().getId() : null,
                                 p.getSharedPublication() != null ? p.getSharedPublication().getId() : null,
                                 p.getParentPublication() != null ? p.getParentPublication().getId() : null,

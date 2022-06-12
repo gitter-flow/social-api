@@ -12,7 +12,6 @@ import java.util.Objects;
 
 @Service
 public class AuthService {
-    
     private final PublicationService publicationService;
     private final CommentService commentService;
     private final CodeService codeService;

@@ -12,6 +12,7 @@ public class RetrieveNewPublicationsResponse {
     private String username;
     private String userId;
     private String content;
+    private String createdAt;
     private String codeId;
     private String sharedPublicationId;
     private String parentPublicationId;
