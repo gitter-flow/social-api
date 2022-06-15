@@ -1,11 +1,14 @@
 package com.gitter.socialapi.auth;
 
 
+import org.keycloak.adapters.KeycloakConfigResolver;
+import org.keycloak.adapters.KeycloakDeployment;
+import org.keycloak.adapters.KeycloakDeploymentBuilder;
 import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
 import org.keycloak.adapters.springsecurity.KeycloakConfiguration;
 import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
 import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
+import org.keycloak.representations.adapters.config.AdapterConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -33,6 +36,16 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
         auth.authenticationProvider(authenticationProvider);
     }
 
+    @Bean
+    public KeycloakDeployment keycloakDeployment(AdapterConfig adapterConfig) {
+        return KeycloakDeploymentBuilder.build(adapterConfig);
+    }
+
+    @Bean
+    public KeycloakConfigResolver keycloakConfigResolver(KeycloakDeployment keycloakDeployment) {
+        return request -> keycloakDeployment;
+    }
+    
     /**
      * Defines the session authentication strategy.
      */
@@ -48,14 +61,11 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
     }
     // Authorize all anonymous and authenticated users by default
     @Override
-    protected void configure(HttpSecurity http) throws Exception
-    {
+    protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
         http.authorizeRequests()
                 .anyRequest()
                 .permitAll();
         http.csrf().disable();
     }
-    
-    
 }

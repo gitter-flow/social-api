@@ -22,7 +22,6 @@ public class AuthService {
         this.commentService = commentService;
         this.codeService = codeService;
     }
-
     public static boolean tokenIsValidForUserWithId(String userId, KeycloakAuthenticationToken authentication) {
         return Objects.equals(userId, authentication.getPrincipal().toString());
     }

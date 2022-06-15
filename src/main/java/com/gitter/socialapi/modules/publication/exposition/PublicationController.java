@@ -5,16 +5,12 @@ import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.modules.publication.application.PublicationService;
 import com.gitter.socialapi.modules.publication.exposition.payload.request.*;
 import com.gitter.socialapi.modules.publication.exposition.payload.response.*;
-import com.gitter.socialapi.modules.publication.exposition.payload.request.RetrieveUserPublicationRequest;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -24,9 +20,9 @@ import java.util.List;
         produces = MediaType.APPLICATION_JSON_VALUE
 )
 public class PublicationController {
-    private PublicationService publicationService;
+    private final PublicationService publicationService;
     
-    private AuthService authService;
+    private final AuthService authService;
     
     @Autowired
     PublicationController(PublicationService publicationService, AuthService authService) {
