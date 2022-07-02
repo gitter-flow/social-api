@@ -1,14 +1,15 @@
 package com.gitter.socialapi.modules.code.application;
 
 import com.gitter.socialapi.modules.code.domain.Code;
-import com.gitter.socialapi.modules.code.exposition.payload.request.AddVersionCodeRequest;
-import com.gitter.socialapi.modules.code.exposition.payload.request.CreateCodeRequest;
-import com.gitter.socialapi.modules.code.exposition.payload.request.DeleteCodeRequest;
-import com.gitter.socialapi.modules.code.exposition.payload.request.RetrieveVersionCodeRequest;
-import com.gitter.socialapi.modules.code.exposition.payload.response.AddVersionCodeResponse;
-import com.gitter.socialapi.modules.code.exposition.payload.response.CreateCodeResponse;
-import com.gitter.socialapi.modules.code.exposition.payload.response.RetrieveCodeResponse;
-import com.gitter.socialapi.modules.code.exposition.payload.response.RetrieveCodeVersionsResponse;
+import com.gitter.socialapi.modules.code.domain.CodeType;
+import com.gitter.socialapi.modules.code.domain.Version;
+import com.gitter.socialapi.modules.code.exposition.payload.request.*;
+import com.gitter.socialapi.modules.code.exposition.payload.request.code_api.RunAndSaveCodeRequest;
+import com.gitter.socialapi.modules.code.exposition.payload.request.code_api.RunCodeAPIRequest;
+import com.gitter.socialapi.modules.code.exposition.payload.response.*;
+import com.gitter.socialapi.modules.code.exposition.payload.response.code_api.RunAndSaveCodeResponse;
+import com.gitter.socialapi.modules.code.exposition.payload.response.code_api.RunCodeAPIResponse;
+import com.gitter.socialapi.modules.code.infrastructure.CodeAPIRepository;
 import com.gitter.socialapi.modules.code.infrastructure.CodeRepository;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.kernel.exceptions.InvalidCodeTypeException;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,12 +29,15 @@ import java.util.UUID;
 public class CodeService {
     private final CodeRepository codeRepository;
     private final PublicationRepository publicationRepository;
+    
+    private final CodeAPIRepository codeAPIRepository;
     private final String baseURL;
     
     @Autowired
-    public CodeService(CodeRepository codeRepository, PublicationRepository publicationRepository, @Value("${application.url}") String baseURL) {
+    public CodeService(CodeRepository codeRepository, PublicationRepository publicationRepository, CodeAPIRepository codeAPIRepository, @Value("${application.url}") String baseURL) {
         this.codeRepository = codeRepository;
         this.publicationRepository = publicationRepository;
+        this.codeAPIRepository = codeAPIRepository;
         this.baseURL = baseURL;
     }
     public Code getCodeFromIdString(String id) throws InvalidParameterException {
@@ -51,22 +56,36 @@ public class CodeService {
         return publication.get();
     }
     
-    public CreateCodeResponse createCode(CreateCodeRequest codeRequest) throws InvalidParameterException, InvalidCodeTypeException {
+    public SaveCodeResponse saveCode(CreateCodeRequest codeRequest) throws InvalidParameterException, InvalidCodeTypeException, IOException, InterruptedException {
         Publication publication = getPublicationFromIdString(codeRequest.getPublicationId());
-        Code code = codeRepository.save(CreateCodeMapper.toCode(codeRequest, publication));
-        return CreateCodeMapper.getResponse(code);
+        Code code;
+        if(publication.getCode() == null) {
+            code = codeRepository.save(CreateCodeMapper.toCode(codeRequest, publication));
+        } else {
+            code = getCodeFromIdString(publication.getCode().getId());
+            code.setCodeType(CodeType.fromString(codeRequest.getCodeType()));
+        }
+        
+        RunAndSaveCodeResponse apiResponse = codeAPIRepository.runAndSaveCode(
+                new RunAndSaveCodeRequest(
+                        String.format("user-%s/code-%s", publication.getUser().getId(), code.getId()),
+                        new RunAndSaveCodeRequest.Data(codeRequest.getCode(), code.getCodeType().getText())
+                )
+        );
+        code.getVersions().add(
+                new Version(apiResponse.getMinioCode().versionId, apiResponse.getMinioResultCode().versionId));
+        codeRepository.save(code);
+        return CreateCodeMapper.getResponse(code, apiResponse.getResultOfExec());
     }
     
+    public RunCodeResponse runCode(RunCodeRequest codeRequest) throws IOException, InterruptedException {
+        RunCodeAPIResponse apiResp = codeAPIRepository.runCode(new RunCodeAPIRequest(codeRequest.getCodeType(), codeRequest.getCodeType()));
+        return new RunCodeResponse(apiResp.getOutput());
+    }
     public RetrieveCodeResponse getCodeFromId(String id) throws InvalidParameterException {
         Code code = getCodeFromIdString(id);
         RetrieveCodeMapper mapper = new RetrieveCodeMapper(baseURL);
         return mapper.getResponse(code);
-    }
-    public AddVersionCodeResponse addVersion(AddVersionCodeRequest addVersionCodeRequest) throws InvalidParameterException {
-        Code code = getCodeFromIdString(addVersionCodeRequest.getId());
-        code.getVersions().add(UUID.randomUUID().toString());
-        codeRepository.save(code);
-        return new AddVersionCodeResponse(code.getVersions().get(0));
     }
     
     public RetrieveCodeVersionsResponse getVersions(RetrieveVersionCodeRequest getVersionCodeRequest) throws InvalidParameterException {

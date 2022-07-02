@@ -12,7 +12,7 @@ public class RetrieveCodeMapper {
 
     public RetrieveCodeResponse getResponse(Code code) {
         return new RetrieveCodeResponse(
-                String.format("%s/publication/%s", baseURL, code.getPublication().getId()),
+                code.getPublication().getId(),
                 code.getBucketLocation(),
                 code.getCodeType().getText(),
                 code.getVersions()

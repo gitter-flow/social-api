@@ -34,9 +34,11 @@ public class Code {
     private CodeType codeType;
 
     @ElementCollection
-    @CollectionTable(name="code_versions", joinColumns=@JoinColumn(name="code_id"))
-    @Column(name="version")
-    public List<String> versions =  new ArrayList<>();
+    @CollectionTable(
+            name = "versions",
+            joinColumns = @JoinColumn(name="code_id")
+    )
+    private List<Version> versions;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -45,10 +47,14 @@ public class Code {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
-    public Code(Publication publication, String bucketLocation, CodeType codeType, List<String> versions) {
+    public Code(Publication publication, String bucketLocation, CodeType codeType, List<Version> versions) {
         this.publication = publication;
         this.bucketLocation = bucketLocation;
         this.codeType = codeType;
         this.versions = versions;
+    }
+    public Code(Publication publication, CodeType codeType) {
+        this.publication = publication;
+        this.codeType = codeType;
     }
 }

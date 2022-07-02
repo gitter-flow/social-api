@@ -1,5 +1,6 @@
 package com.gitter.socialapi.modules.code.exposition.payload.response;
 
+import com.gitter.socialapi.modules.code.domain.Version;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -7,8 +8,8 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class RetrieveCodeResponse {
-    private String publicationURI;
-    private String bucketLocation;
+    private String publicationId;
     private String codeType;
-    private List<String> versions;
+    private String code;
+    private List<Version> versions;
 }

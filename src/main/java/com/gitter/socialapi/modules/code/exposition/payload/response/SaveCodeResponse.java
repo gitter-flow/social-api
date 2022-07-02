@@ -5,6 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class CreateCodeResponse {
+public class SaveCodeResponse {
     private String id;
+    private String output;
 }

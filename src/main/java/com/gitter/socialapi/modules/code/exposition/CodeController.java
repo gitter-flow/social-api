@@ -1,14 +1,8 @@
 package com.gitter.socialapi.modules.code.exposition;
 
 import com.gitter.socialapi.modules.code.application.CodeService;
-import com.gitter.socialapi.modules.code.exposition.payload.request.AddVersionCodeRequest;
-import com.gitter.socialapi.modules.code.exposition.payload.request.CreateCodeRequest;
-import com.gitter.socialapi.modules.code.exposition.payload.request.DeleteCodeRequest;
-import com.gitter.socialapi.modules.code.exposition.payload.request.RetrieveVersionCodeRequest;
-import com.gitter.socialapi.modules.code.exposition.payload.response.AddVersionCodeResponse;
-import com.gitter.socialapi.modules.code.exposition.payload.response.CreateCodeResponse;
-import com.gitter.socialapi.modules.code.exposition.payload.response.RetrieveCodeResponse;
-import com.gitter.socialapi.modules.code.exposition.payload.response.RetrieveCodeVersionsResponse;
+import com.gitter.socialapi.modules.code.exposition.payload.request.*;
+import com.gitter.socialapi.modules.code.exposition.payload.response.*;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.kernel.exceptions.InvalidCodeTypeException;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
@@ -18,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping(
         value = "/code",
@@ -25,20 +21,21 @@ import org.springframework.web.bind.annotation.*;
         produces = MediaType.APPLICATION_JSON_VALUE
 )
 public class CodeController {
-    private CodeService codeService;
+    private final CodeService codeService;
+    
     @Autowired
     CodeController(CodeService codeService) {
         this.codeService = codeService;
     }
     
-    @PostMapping
+    @PostMapping("/save")
     @PreAuthorize("@authService.tokenIsValidForPublicationWithId(#code.publicationId, #authentication)")
-    public ResponseEntity<CreateCodeResponse> createCode(@RequestBody CreateCodeRequest code, KeycloakAuthenticationToken authentication) throws InvalidParameterException, InvalidCodeTypeException {
-        return ResponseEntity.ok(codeService.createCode(code));
+    public ResponseEntity<SaveCodeResponse> createCode(@RequestBody CreateCodeRequest code, KeycloakAuthenticationToken authentication) throws InvalidParameterException, InvalidCodeTypeException, IOException, InterruptedException {
+        return ResponseEntity.ok(codeService.saveCode(code));
     }
     @PutMapping("/run")
-    public AddVersionCodeResponse addVersion(@RequestBody AddVersionCodeRequest addVersionCodeRequest) throws InvalidParameterException {
-        return codeService.addVersion(addVersionCodeRequest);
+    public RunCodeResponse runCode(@RequestBody RunCodeRequest addVersionCodeRequest) throws InvalidParameterException, IOException, InterruptedException {
+        return codeService.runCode(addVersionCodeRequest);
     }
     @GetMapping("/{id}")
     public ResponseEntity<RetrieveCodeResponse> getCodeFromId(@PathVariable String id) throws InvalidParameterException {

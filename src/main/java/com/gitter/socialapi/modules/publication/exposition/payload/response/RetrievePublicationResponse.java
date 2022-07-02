@@ -16,5 +16,4 @@ public class RetrievePublicationResponse {
     private String sharedPublicationId;
     private String parentPublicationId;
     private List<String> likes;
-    
 }

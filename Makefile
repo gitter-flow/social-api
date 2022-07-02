@@ -20,8 +20,7 @@ run:
 .PHONY: run
 
 run-local:
-	mvn clean install -DskipTests=true -Dsonar.skip=true -Dexec.mainClass="com.gitter.socialapi.SocialApiApplication"
-	mvn exec:java -Dexec.mainClass="org.esgi.trademe.Main"
+	mvn spring-boot:run -Dspring.profiles.active=local
 .PHONY: run-local
 
 test:

@@ -90,6 +90,7 @@ public class PublicationController {
                 likePublicationRequest.getPublicationId(),
                 likePublicationRequest.getUserId()));
     }
+    
     @PostMapping("/unlike")
     @PreAuthorize("@authService.tokenIsValidForUserWithId(#unlikePublicationRequest.userId, #authentication)")
     public ResponseEntity<String> unlikePublication(@RequestBody UpdateUnlikePublicationRequest unlikePublicationRequest, KeycloakAuthenticationToken authentication) throws InvalidParameterException {
