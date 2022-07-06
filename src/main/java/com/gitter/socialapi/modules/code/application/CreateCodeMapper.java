@@ -20,6 +20,11 @@ public class CreateCodeMapper {
         );
     }
     public static SaveCodeResponse getResponse(Code code, String output) {
-        return new SaveCodeResponse(code.getId(), output);
+        return new SaveCodeResponse(
+                code.getId(),
+                code.getVersions().get(0).getCodeVersion(),
+                code.getVersions().get(0).getOutputVersion(),
+                output
+        );
     }
 }

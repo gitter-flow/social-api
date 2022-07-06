@@ -2,6 +2,7 @@ package com.gitter.socialapi.modules.code.exposition;
 
 import com.gitter.socialapi.modules.code.application.CodeService;
 import com.gitter.socialapi.modules.code.exposition.payload.request.*;
+import com.gitter.socialapi.modules.code.exposition.payload.request.code_api.GetCodeListVersionsRequest;
 import com.gitter.socialapi.modules.code.exposition.payload.response.*;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.kernel.exceptions.InvalidCodeTypeException;
@@ -33,19 +34,27 @@ public class CodeController {
     public ResponseEntity<SaveCodeResponse> createCode(@RequestBody CreateCodeRequest code, KeycloakAuthenticationToken authentication) throws InvalidParameterException, InvalidCodeTypeException, IOException, InterruptedException {
         return ResponseEntity.ok(codeService.saveCode(code));
     }
-    @PutMapping("/run")
-    public RunCodeResponse runCode(@RequestBody RunCodeRequest addVersionCodeRequest) throws InvalidParameterException, IOException, InterruptedException {
-        return codeService.runCode(addVersionCodeRequest);
+    @PostMapping("/run")
+    public ResponseEntity<RunCodeResponse> runCode(@RequestBody RunCodeRequest addVersionCodeRequest) throws IOException, InterruptedException, InvalidParameterException {
+        return ResponseEntity.ok(codeService.runCode(addVersionCodeRequest));
     }
     @GetMapping("/{id}")
     public ResponseEntity<RetrieveCodeResponse> getCodeFromId(@PathVariable String id) throws InvalidParameterException {
         return ResponseEntity.ok(codeService.getCodeFromId(id));
     }
     @GetMapping("/versions")
-    public ResponseEntity<RetrieveCodeVersionsResponse> getVersions(@RequestBody RetrieveVersionCodeRequest getVersionCodeRequest) throws InvalidParameterException {
-        RetrieveCodeVersionsResponse versions = codeService.getVersions(getVersionCodeRequest);
+    public ResponseEntity<RetrieveCodeVersionsResponse> getVersions(@RequestParam(value= "codeId") String codeId) throws InvalidParameterException {
+        RetrieveCodeVersionsResponse versions = codeService.getVersions(codeId);
        return ResponseEntity.ok(versions);
     }
+    @GetMapping("/version")
+    public ResponseEntity<String> getCodeVersion(
+            @RequestParam(value= "codeId") String codeId, @RequestParam(value = "versionId") String versionId)
+            throws InvalidParameterException, IOException, InterruptedException {
+        String code = codeService.getCodeVersion(codeId, versionId); 
+        return ResponseEntity.ok(code);
+    }
+    
     @DeleteMapping("/{id}")
     @PreAuthorize("@authService.tokenIsValidForCodeWithId(#deleteCodeRequest.id, #authentication)")
     public ResponseEntity<String> deleteCode(@RequestBody DeleteCodeRequest deleteCodeRequest, KeycloakAuthenticationToken authentication) throws InvalidParameterException {

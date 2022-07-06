@@ -1,5 +1,6 @@
 package com.gitter.socialapi.modules.code.infrastructure;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gitter.socialapi.kernel.exceptions.UnexpectedInternalRequestException;
 import com.gitter.socialapi.kernel.exceptions.UnexpectedInternalResponseException;
@@ -8,6 +9,9 @@ import com.gitter.socialapi.modules.code.exposition.payload.request.code_api.Run
 import com.gitter.socialapi.modules.code.exposition.payload.response.code_api.RunAndSaveCodeResponse;
 import com.gitter.socialapi.modules.code.exposition.payload.response.code_api.RunCodeAPIResponse;
 import com.google.gson.Gson;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.protocol.HTTP;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +22,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.HashMap;
 @Service
 public class CodeAPIRepository {
@@ -59,13 +64,18 @@ public class CodeAPIRepository {
     }
 
     public RunAndSaveCodeResponse runAndSaveCode(RunAndSaveCodeRequest request) throws IOException, InterruptedException {
-        HashMap<String, String> body = new HashMap<>(){{
-            put("namefile", request.getFileName());
-            put("data", new HashMap<>(){{
+
+        JSONObject body =  new JSONObject();
+        try {
+            body.put("namefile", request.getFileName());
+            body.put("data", new JSONObject(new HashMap<>() {{
                 put("mod", request.getData().mod);
                 put("data", request.getData().data);
-            }}.toString());
-        }};
+                }}
+            ));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         var objectMapper = new ObjectMapper();
         String requestBody = objectMapper
                 .writeValueAsString(body);
@@ -73,10 +83,10 @@ public class CodeAPIRepository {
         String uriStr = String.format("%s/resources/minio/code", codeApiURL);
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
                 .uri(URI.create(uriStr))
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .PUT(HttpRequest.BodyPublishers.ofString(body.toString()))
                 .build();
-        
         HttpResponse<String> response = client.send(httpRequest,
                 HttpResponse.BodyHandlers.ofString());
         if(response.statusCode() / 100 != 2) {
@@ -84,11 +94,36 @@ public class CodeAPIRepository {
         }
         JSONObject jsonObject =new JSONObject(response.body());
         
-        if(jsonObject.has("result")) {
-            throw  UnexpectedInternalResponseException.forRequest(uriStr, response.body());
+        if(!jsonObject.has("result")) {
+            throw UnexpectedInternalResponseException.forRequest(uriStr, response.body());
         }
         JSONObject result = (JSONObject)jsonObject.get("result");
-        
+
         return gson.fromJson(result.toString(), RunAndSaveCodeResponse.class);
+    }
+
+    public String getVersionCode(String fileName, String versionId) throws IOException, InterruptedException {
+        HashMap<String, String> body = new HashMap<>(){{
+            put("namefile", fileName);
+            put("version_of_file", versionId);
+        }};
+        var objectMapper = new ObjectMapper();
+        String requestBody = objectMapper
+                .writeValueAsString(body);
+
+        String uriStr = String.format("%s/minio/version", codeApiURL);
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .header("Content-Type", "application/json")
+                .uri(URI.create(uriStr))
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
+
+        HttpResponse<String> response = client.send(httpRequest,
+                HttpResponse.BodyHandlers.ofString());
+
+        if(response.statusCode() / 100 != 2) {
+            throw  UnexpectedInternalRequestException.forRequest(uriStr, response.statusCode(), response.body());
+        }
+        return response.body();
     }
 }

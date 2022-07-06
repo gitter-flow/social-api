@@ -7,5 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class SaveCodeResponse {
     private String id;
+    private String codeVersion;
+    private String outputVersion;
     private String output;
 }

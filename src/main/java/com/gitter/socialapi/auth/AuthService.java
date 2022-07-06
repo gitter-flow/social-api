@@ -27,6 +27,7 @@ public class AuthService {
     }
     public boolean tokenIsValidForPublicationWithId(String publicationId, KeycloakAuthenticationToken authentication) throws InvalidParameterException {
         String userId = publicationService.getPublicationByID(publicationId).getUserId();
+        System.out.println(userId);
         return Objects.equals(userId, authentication.getPrincipal().toString());
     }
     public boolean tokenIsValidForCommentWithId(String commentId, KeycloakAuthenticationToken authentication) throws InvalidParameterException {

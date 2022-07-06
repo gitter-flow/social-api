@@ -38,7 +38,7 @@ public class Code {
             name = "versions",
             joinColumns = @JoinColumn(name="code_id")
     )
-    private List<Version> versions;
+    private List<Version> versions = new ArrayList<>();
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

@@ -1,5 +1,6 @@
 package com.gitter.socialapi.modules.code.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gitter.socialapi.modules.code.domain.Code;
 import com.gitter.socialapi.modules.code.domain.CodeType;
 import com.gitter.socialapi.modules.code.domain.Version;
@@ -31,8 +32,10 @@ public class CodeService {
     private final PublicationRepository publicationRepository;
     
     private final CodeAPIRepository codeAPIRepository;
+    
     private final String baseURL;
     
+    private final static String BUCKET_FILENAME_FORMAT="user-%s/code-%s.%s";
     @Autowired
     public CodeService(CodeRepository codeRepository, PublicationRepository publicationRepository, CodeAPIRepository codeAPIRepository, @Value("${application.url}") String baseURL) {
         this.codeRepository = codeRepository;
@@ -68,18 +71,19 @@ public class CodeService {
         
         RunAndSaveCodeResponse apiResponse = codeAPIRepository.runAndSaveCode(
                 new RunAndSaveCodeRequest(
-                        String.format("user-%s/code-%s", publication.getUser().getId(), code.getId()),
+                        String.format(BUCKET_FILENAME_FORMAT, publication.getUser().getId(), code.getId(), CodeType.extension(code.getCodeType())),
                         new RunAndSaveCodeRequest.Data(codeRequest.getCode(), code.getCodeType().getText())
                 )
         );
         code.getVersions().add(
-                new Version(apiResponse.getMinioCode().versionId, apiResponse.getMinioResultCode().versionId));
+                new Version(apiResponse.getMinioCode().getVersionId(), apiResponse.getMinioResultCode().getVersionId()));
+
         codeRepository.save(code);
+        
         return CreateCodeMapper.getResponse(code, apiResponse.getResultOfExec());
     }
-    
-    public RunCodeResponse runCode(RunCodeRequest codeRequest) throws IOException, InterruptedException {
-        RunCodeAPIResponse apiResp = codeAPIRepository.runCode(new RunCodeAPIRequest(codeRequest.getCodeType(), codeRequest.getCodeType()));
+    public RunCodeResponse runCode(RunCodeRequest codeRequest) throws IOException, InterruptedException, InvalidParameterException {
+        RunCodeAPIResponse apiResp = codeAPIRepository.runCode(new RunCodeAPIRequest(CodeAPIMapper.toAPICodeType(CodeType.fromString(codeRequest.getCodeType())), codeRequest.getCode()));
         return new RunCodeResponse(apiResp.getOutput());
     }
     public RetrieveCodeResponse getCodeFromId(String id) throws InvalidParameterException {
@@ -88,11 +92,16 @@ public class CodeService {
         return mapper.getResponse(code);
     }
     
-    public RetrieveCodeVersionsResponse getVersions(RetrieveVersionCodeRequest getVersionCodeRequest) throws InvalidParameterException {
-        Code code = getCodeFromIdString(getVersionCodeRequest.getId());
+    public RetrieveCodeVersionsResponse getVersions(String codeId) throws InvalidParameterException {
+        Code code = getCodeFromIdString(codeId);
         return new RetrieveCodeVersionsResponse(code.getVersions());
     }
 
+    public String getCodeVersion(String codeId, String versionId) throws InvalidParameterException, IOException, InterruptedException {
+        Code code = getCodeFromIdString(codeId);
+        String fileName = String.format(BUCKET_FILENAME_FORMAT, code.getPublication().getUser().getId(), code.getPublication().getId(), CodeType.extension(code.getCodeType()));
+        return codeAPIRepository.getVersionCode(fileName, versionId);
+    }
     public void deleteCode(DeleteCodeRequest deleteCodeRequest) throws InvalidParameterException {
         Code code = getCodeFromIdString(deleteCodeRequest.getId());
         codeRepository.delete(code);

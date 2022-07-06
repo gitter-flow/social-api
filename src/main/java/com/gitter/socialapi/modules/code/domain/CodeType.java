@@ -23,4 +23,21 @@ public enum CodeType {
         }
         throw InvalidCodeTypeException.withValue(text);
     }
+    
+    public static String extension(CodeType codeType) {
+        switch (codeType) {
+            case C -> {
+                return "c";
+            }
+            case PYTHON -> {
+                return "py";
+            }
+            case SHELL -> {
+                return "sh";
+            }
+            default -> {
+                return "";
+            }
+        }
+    }
 }

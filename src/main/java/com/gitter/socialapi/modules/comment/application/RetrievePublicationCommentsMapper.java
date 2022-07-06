@@ -11,6 +11,7 @@ public class RetrievePublicationCommentsMapper {
     public static List<RetrievePublicationCommentsResponse> toResponse(List<Comment> commentPage) {
         return commentPage.stream().map(
                 c -> new RetrievePublicationCommentsResponse(
+                        c.getId(),
                         c.getUser().getUsername(),
                         c.getUser().getId(),
                         c.getContent(),
