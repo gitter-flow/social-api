@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping(
@@ -50,7 +51,7 @@ public class CodeController {
     @GetMapping("/version")
     public ResponseEntity<String> getCodeVersion(
             @RequestParam(value= "codeId") String codeId, @RequestParam(value = "versionId") String versionId)
-            throws InvalidParameterException, IOException, InterruptedException {
+            throws InvalidParameterException, IOException, InterruptedException, URISyntaxException {
         String code = codeService.getCodeVersion(codeId, versionId); 
         return ResponseEntity.ok(code);
     }

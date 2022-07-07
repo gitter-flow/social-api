@@ -1,6 +1,7 @@
 package com.gitter.socialapi.modules.code.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.gitter.socialapi.kernel.exceptions.InvalidCodeVersionException;
 import com.gitter.socialapi.modules.code.domain.Code;
 import com.gitter.socialapi.modules.code.domain.CodeType;
 import com.gitter.socialapi.modules.code.domain.Version;
@@ -22,8 +23,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -97,9 +101,9 @@ public class CodeService {
         return new RetrieveCodeVersionsResponse(code.getVersions());
     }
 
-    public String getCodeVersion(String codeId, String versionId) throws InvalidParameterException, IOException, InterruptedException {
+    public String getCodeVersion(String codeId, String versionId) throws InvalidParameterException, IOException, InterruptedException, URISyntaxException {
         Code code = getCodeFromIdString(codeId);
-        String fileName = String.format(BUCKET_FILENAME_FORMAT, code.getPublication().getUser().getId(), code.getPublication().getId(), CodeType.extension(code.getCodeType()));
+        String fileName = String.format(BUCKET_FILENAME_FORMAT, code.getPublication().getUser().getId(), code.getPublication().getCode().getId(), CodeType.extension(code.getCodeType()));
         return codeAPIRepository.getVersionCode(fileName, versionId);
     }
     public void deleteCode(DeleteCodeRequest deleteCodeRequest) throws InvalidParameterException {

@@ -27,4 +27,8 @@ public class ExceptionController {
     public ResponseEntity<Object> unexpectedInternalRequest(UnexpectedInternalResponseException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    @ExceptionHandler(value = InvalidCodeVersionException.class)
+    public ResponseEntity<Object> unexpectedInternalRequest(InvalidCodeVersionException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
