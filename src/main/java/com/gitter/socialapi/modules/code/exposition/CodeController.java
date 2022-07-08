@@ -40,7 +40,7 @@ public class CodeController {
         return ResponseEntity.ok(codeService.runCode(addVersionCodeRequest));
     }
     @GetMapping("/{id}")
-    public ResponseEntity<RetrieveCodeResponse> getCodeFromId(@PathVariable String id) throws InvalidParameterException {
+    public ResponseEntity<RetrieveCodeResponse> getCodeFromId(@PathVariable String id) throws InvalidParameterException, IOException, URISyntaxException, InterruptedException {
         return ResponseEntity.ok(codeService.getCodeFromId(id));
     }
     @GetMapping("/versions")

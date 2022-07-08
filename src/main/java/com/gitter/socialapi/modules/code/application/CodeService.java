@@ -90,10 +90,11 @@ public class CodeService {
         RunCodeAPIResponse apiResp = codeAPIRepository.runCode(new RunCodeAPIRequest(CodeAPIMapper.toAPICodeType(CodeType.fromString(codeRequest.getCodeType())), codeRequest.getCode()));
         return new RunCodeResponse(apiResp.getOutput());
     }
-    public RetrieveCodeResponse getCodeFromId(String id) throws InvalidParameterException {
+    public RetrieveCodeResponse getCodeFromId(String id) throws InvalidParameterException, IOException, URISyntaxException, InterruptedException {
         Code code = getCodeFromIdString(id);
         RetrieveCodeMapper mapper = new RetrieveCodeMapper(baseURL);
-        return mapper.getResponse(code);
+        String lastCode = getCodeVersion(code.getId(), code.getVersions().get(0).getCodeVersion());
+        return mapper.getResponse(code, lastCode);
     }
     
     public RetrieveCodeVersionsResponse getVersions(String codeId) throws InvalidParameterException {

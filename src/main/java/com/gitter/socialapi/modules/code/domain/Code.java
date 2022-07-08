@@ -27,9 +27,6 @@ public class Code {
     @JoinColumn(name = "publication_id")
     @EqualsAndHashCode.Exclude
     private Publication publication;
-
-    private String bucketLocation;
-
     @Enumerated(EnumType.STRING)
     private CodeType codeType;
 
@@ -47,9 +44,8 @@ public class Code {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
-    public Code(Publication publication, String bucketLocation, CodeType codeType, List<Version> versions) {
+    public Code(Publication publication,  CodeType codeType, List<Version> versions) {
         this.publication = publication;
-        this.bucketLocation = bucketLocation;
         this.codeType = codeType;
         this.versions = versions;
     }

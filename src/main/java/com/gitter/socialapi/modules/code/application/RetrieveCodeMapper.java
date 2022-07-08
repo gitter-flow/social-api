@@ -10,11 +10,11 @@ public class RetrieveCodeMapper {
         this.baseURL = baseURL;
     }
 
-    public RetrieveCodeResponse getResponse(Code code) {
+    public RetrieveCodeResponse getResponse(Code code, String lastCode) {
         return new RetrieveCodeResponse(
                 code.getPublication().getId(),
-                code.getBucketLocation(),
                 code.getCodeType().getText(),
+                lastCode,
                 code.getVersions()
         );
     }
