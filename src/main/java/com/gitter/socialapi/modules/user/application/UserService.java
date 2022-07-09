@@ -90,7 +90,7 @@ public class UserService {
         User user = getUserFromStringId(updateUnfollowUserRequest.getUserId());
 
         List<User> newFollows = user.getFollows().stream()
-                .filter(u -> !Objects.equals(u.getId(), updateUnfollowUserRequest.getUserId()))
+                .filter(u -> !Objects.equals(u.getId(), updateUnfollowUserRequest.getUserToUnfollowId()))
                 .collect(Collectors.toList());
         user.setFollows(newFollows);
         userRepository.save(user);
