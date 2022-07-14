@@ -1,6 +1,7 @@
 package com.gitter.socialapi.modules.user.domain;
 
 import com.gitter.socialapi.modules.publication.domain.Publication;
+import com.gitter.socialapi.modules.team.domain.Team;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -37,6 +38,8 @@ public class User {
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "follows", cascade = CascadeType.ALL)
     private List<User> followedBy = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "members", cascade = CascadeType.ALL)
+    private List<Team> teams = new ArrayList<>();
     @OneToMany(fetch = FetchType.LAZY, targetEntity = Publication.class, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Publication> publications = new HashSet<>();
 
