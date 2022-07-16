@@ -38,7 +38,7 @@ public class TeamController {
     
     @PutMapping("/join")
     @PreAuthorize("@authService.tokenIsValidForUserWithId(#joinTeamRequest.userId, #authentication)")
-    public ResponseEntity<String> joinTeam(@RequestBody JoinTeamRequest joinTeamRequest , KeycloakAuthenticationToken authentication) throws InvalidParameterException {
+    public ResponseEntity<String> joinTeam(@RequestBody JoinTeamRequest joinTeamRequest, KeycloakAuthenticationToken authentication) throws InvalidParameterException {
         teamService.joinTeam(joinTeamRequest);
         return ResponseEntity.ok(String.format("User with id %s joined team with id %s", joinTeamRequest.getUserId(), joinTeamRequest.getTeamId()));
     }
@@ -48,5 +48,12 @@ public class TeamController {
     public ResponseEntity<String> leaveTeam(@RequestBody LeaveTeamRequest leaveTeamRequest , KeycloakAuthenticationToken authentication) throws InvalidParameterException {
         teamService.leaveTeam(leaveTeamRequest);
         return ResponseEntity.ok(String.format("User with id %s joined team with id %s", leaveTeamRequest.getUserId(), leaveTeamRequest.getTeamId()));
+    }
+    
+    @DeleteMapping("/{id}")
+    @PreAuthorize("@authService.tokenIsValidForTeamWithId(#id, #authentication)")
+    public ResponseEntity<String> deleteTeam(@PathVariable String id, KeycloakAuthenticationToken authentication) {
+        teamService.deleteTeam(id);
+        return ResponseEntity.ok(String.format("Team with ID %s has been deleted", id));
     }
 }

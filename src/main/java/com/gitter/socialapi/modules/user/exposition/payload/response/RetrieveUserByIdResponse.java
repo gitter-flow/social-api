@@ -12,6 +12,7 @@ public class RetrieveUserByIdResponse {
     private String username;
     private Integer numberOfFollowers;
     private Integer numberOfFollows;
+    private List<TeamUserResponse> ownedTeams;
     private List<TeamUserResponse> teams;
 }
 

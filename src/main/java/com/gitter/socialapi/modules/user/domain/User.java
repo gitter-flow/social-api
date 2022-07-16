@@ -38,6 +38,9 @@ public class User {
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "follows", cascade = CascadeType.ALL)
     private List<User> followedBy = new ArrayList<>();
 
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<Team> ownedTeams;
+    
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "members", cascade = CascadeType.ALL)
     private List<Team> teams = new ArrayList<>();
     @OneToMany(fetch = FetchType.LAZY, targetEntity = Publication.class, cascade = CascadeType.ALL, orphanRemoval = true)

@@ -9,5 +9,6 @@ import java.util.List;
 @AllArgsConstructor
 public class RetrieveTeamResponse {
     private String name;
+    private String ownerId;
     private List<String> memberId;
 }

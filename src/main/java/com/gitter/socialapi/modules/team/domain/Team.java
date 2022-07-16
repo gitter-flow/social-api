@@ -2,6 +2,7 @@ package com.gitter.socialapi.modules.team.domain;
 
 import com.gitter.socialapi.modules.code.domain.Code;
 import com.gitter.socialapi.modules.comment.domain.Comment;
+import com.gitter.socialapi.modules.publication.domain.Publication;
 import com.gitter.socialapi.modules.user.domain.User;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -25,9 +26,13 @@ public class Team {
     @Column(name = "id", nullable = false)
     private String id = UUID.randomUUID().toString();
     
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     private String name;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name= "team_owner", foreignKey = @javax.persistence.ForeignKey(name = "none"))
+    private User owner;
+    
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "teams_members",
@@ -44,8 +49,8 @@ public class Team {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
     
-    public Team(String name, ArrayList<User> users) {
+    public Team(String name, User owner) {
         this.name = name;
-        this.members = users;
+        this.owner = owner;
     }
 }

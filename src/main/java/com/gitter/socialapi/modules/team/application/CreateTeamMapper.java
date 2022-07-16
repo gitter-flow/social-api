@@ -11,11 +11,9 @@ import java.util.List;
 public class CreateTeamMapper {
     
     public static Team toEntityTeam(CreateTeamRequest createTeamRequest, User user) {
-        ArrayList<User> users =  new ArrayList<>();
-        users.add(user);
         return new Team(
                 createTeamRequest.getTeamName(),
-                users
+                user
         );
     }
     

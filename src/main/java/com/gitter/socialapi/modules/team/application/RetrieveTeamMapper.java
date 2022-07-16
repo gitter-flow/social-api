@@ -11,6 +11,7 @@ public class RetrieveTeamMapper {
     public static RetrieveTeamResponse toResponse(Team team) {
         return new RetrieveTeamResponse(
                 team.getName(),
+                team.getOwner().getId(),
                 team.getMembers().stream().map(
                         User::getId
                 ).collect(Collectors.toList())

@@ -5,10 +5,7 @@ import com.gitter.socialapi.auth.AuthService;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.modules.user.application.UserService;
 import com.gitter.socialapi.modules.user.exposition.payload.request.*;
-import com.gitter.socialapi.modules.user.exposition.payload.response.CreateUserResponse;
-import com.gitter.socialapi.modules.user.exposition.payload.response.RetrieveUserByIdResponse;
-import com.gitter.socialapi.modules.user.exposition.payload.response.RetrieveUserFollowersResponse;
-import com.gitter.socialapi.modules.user.exposition.payload.response.RetrieveUserFollowsResponse;
+import com.gitter.socialapi.modules.user.exposition.payload.response.*;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.adapters.springsecurity.account.SimpleKeycloakAccount;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
@@ -83,6 +80,18 @@ public class UserController {
         System.out.println(authentication.getPrincipal().toString());
 
         return ResponseEntity.ok(null);
+    }
+    
+    @GetMapping(
+            value = "/search/{username}",
+            params = {"page", "size"}
+    )
+    public ResponseEntity<List<SearchUserResponse>> searchUser(
+            @PathVariable(value= "username") String username,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size
+          ) {
+        return ResponseEntity.ok(userService.searchUser(username, page, size));
     }
     @PutMapping
     @PreAuthorize("@authService.tokenIsValidForUserWithId(#updateUserRequest.id, #authentication)")

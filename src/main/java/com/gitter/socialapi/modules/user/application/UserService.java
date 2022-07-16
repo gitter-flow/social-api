@@ -1,19 +1,18 @@
 package com.gitter.socialapi.modules.user.application;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.kernel.exceptions.NoSuchEntityException;
+import com.gitter.socialapi.modules.publication.domain.Publication;
 import com.gitter.socialapi.modules.user.exposition.payload.request.*;
-import com.gitter.socialapi.modules.user.exposition.payload.response.CreateUserResponse;
-import com.gitter.socialapi.modules.user.exposition.payload.response.RetrieveUserByIdResponse;
-import com.gitter.socialapi.modules.user.exposition.payload.response.RetrieveUserFollowersResponse;
+import com.gitter.socialapi.modules.user.exposition.payload.response.*;
 import com.gitter.socialapi.modules.user.infrastructure.UserRepository;
 import com.gitter.socialapi.modules.user.exposition.payload.request.RetrieveUserFollowersRequest;
-import com.gitter.socialapi.modules.user.exposition.payload.response.RetrieveUserFollowsResponse;
 import com.gitter.socialapi.modules.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -53,6 +52,13 @@ public class UserService {
     public RetrieveUserByIdResponse getById(String id) throws InvalidParameterException {
         User user = getUserFromStringId(id);
         return RetrieveUserMapper.toGetUserByIdResponse(user);
+    }
+
+    
+    public List<SearchUserResponse> searchUser(String username, int pageNumber, int numberPerPage) {
+        PageRequest page = PageRequest.of(pageNumber, numberPerPage);
+        List<User> userList = userRepository.selectWhereUsernameLike(username, page);
+        return SearchUserMapper.toResponse(userList);
     }
     
     public List<RetrieveUserFollowersResponse> retrieveUserFollowers(RetrieveUserFollowersRequest request) throws InvalidParameterException {
@@ -95,5 +101,6 @@ public class UserService {
         user.setFollows(newFollows);
         userRepository.save(user);
     }
+
     
 }

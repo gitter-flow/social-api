@@ -2,6 +2,7 @@ package com.gitter.socialapi.modules.team.application;
 
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.kernel.exceptions.NoSuchEntityException;
+import com.gitter.socialapi.kernel.exceptions.TeamAlreadyExistsException;
 import com.gitter.socialapi.modules.team.domain.Team;
 import com.gitter.socialapi.modules.team.exposition.payload.request.*;
 import com.gitter.socialapi.modules.team.exposition.payload.response.CreateTeamResponse;
@@ -12,6 +13,7 @@ import com.gitter.socialapi.modules.user.domain.User;
 import com.gitter.socialapi.modules.user.infrastructure.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -52,7 +54,11 @@ public class TeamService {
     public CreateTeamResponse createTeam(CreateTeamRequest createRequest) throws InvalidParameterException {
         User user = userService.getUserFromStringId(createRequest.getUserId());
         Team team = CreateTeamMapper.toEntityTeam(createRequest, user);
-        teamRepository.save(team);
+        try {
+            teamRepository.save(team);
+        } catch (DataIntegrityViolationException e) {
+            throw  TeamAlreadyExistsException.withName(team.getName());
+        }
         return CreateTeamMapper.toResponse(team);
     }
     
@@ -74,5 +80,8 @@ public class TeamService {
         );
         teamRepository.save(team);
     }
-
+    
+    public void deleteTeam(String id) {
+        teamRepository.deleteById(id);
+    }
 }

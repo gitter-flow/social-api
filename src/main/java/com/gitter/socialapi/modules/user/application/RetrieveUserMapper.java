@@ -15,6 +15,9 @@ public class RetrieveUserMapper {
                 user.getUsername(),
                 user.getFollowedBy().size(),
                 user.getFollows().size(),
+                user.getOwnedTeams().stream().map(
+                        t -> new TeamUserResponse(t.getId(), t.getName())
+                ).collect(Collectors.toList()), 
                 user.getTeams().stream().map(
                         t -> new TeamUserResponse(t.getId(), t.getName())
                 ).collect(Collectors.toList())
