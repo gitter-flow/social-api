@@ -18,10 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -78,7 +75,7 @@ public class UserService {
         User user = getUserFromStringId(userId);
         if(user.getPictureFileName() == null) throw NoProfilePictureException.forUser(userId);
         InputStream stream = pictureRepository.getPicture(String.format(user.getPictureFileName(), userId));
-        return IOUtils.toByteArray(stream);
+        return Base64.getDecoder().decode(IOUtils.toByteArray(stream));
     }
     public List<RetrieveUserFollowersResponse> retrieveUserFollowers(RetrieveUserFollowersRequest request) throws InvalidParameterException {
         List<User> followers = new ArrayList<>(getUserFromStringId(request.getUserId()).getFollowedBy());
