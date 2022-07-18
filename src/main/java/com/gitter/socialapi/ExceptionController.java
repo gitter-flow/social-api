@@ -35,4 +35,8 @@ public class ExceptionController {
     public ResponseEntity<Object> teamAlreadyExists(TeamAlreadyExistsException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(value = NoProfilePictureException.class)
+    public ResponseEntity<Object> noProfilePicture(NoProfilePictureException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+    }
 }

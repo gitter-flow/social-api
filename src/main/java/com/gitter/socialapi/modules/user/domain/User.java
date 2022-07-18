@@ -27,6 +27,9 @@ public class User {
     
     @Column(name= "description")
     private String description;
+    
+    @Column(name="picture")
+    private String pictureFileName;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_follows",

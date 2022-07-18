@@ -1,20 +1,23 @@
 package com.gitter.socialapi.modules.user.application;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
+import com.gitter.socialapi.kernel.exceptions.NoProfilePictureException;
 import com.gitter.socialapi.kernel.exceptions.NoSuchEntityException;
-import com.gitter.socialapi.modules.publication.domain.Publication;
 import com.gitter.socialapi.modules.user.exposition.payload.request.*;
 import com.gitter.socialapi.modules.user.exposition.payload.response.*;
+import com.gitter.socialapi.modules.user.infrastructure.UserPictureRepository;
 import com.gitter.socialapi.modules.user.infrastructure.UserRepository;
 import com.gitter.socialapi.modules.user.exposition.payload.request.RetrieveUserFollowersRequest;
 import com.gitter.socialapi.modules.user.domain.User;
+import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -27,11 +30,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     
+    private final UserPictureRepository pictureRepository;
     private final String baseURL;
     
     @Autowired
-    public UserService(UserRepository userRepository, @Value("${application.url}") String baseURL) {
+    public UserService(UserRepository userRepository, UserPictureRepository pictureRepository, @Value("${application.url}") String baseURL) {
         this.userRepository = userRepository;
+        this.pictureRepository = pictureRepository;
         this.baseURL = baseURL;
     }
 
@@ -61,6 +66,20 @@ public class UserService {
         return SearchUserMapper.toResponse(userList);
     }
     
+    public void uploadUserPicture(byte[] image, String userId, String format) throws IOException, InvalidParameterException {
+        User user = getUserFromStringId(userId);
+        String filename = String.format("user-pic-%s.%s", userId, format);
+        pictureRepository.uploadPicture(image, filename, format);
+        user.setPictureFileName(filename);
+        userRepository.save(user);
+    }
+    
+    public byte[] getUserPicture(String userId) throws IOException, InvalidParameterException, NoProfilePictureException {
+        User user = getUserFromStringId(userId);
+        if(user.getPictureFileName() == null) throw NoProfilePictureException.forUser(userId);
+        InputStream stream = pictureRepository.getPicture(String.format(user.getPictureFileName(), userId));
+        return IOUtils.toByteArray(stream);
+    }
     public List<RetrieveUserFollowersResponse> retrieveUserFollowers(RetrieveUserFollowersRequest request) throws InvalidParameterException {
         List<User> followers = new ArrayList<>(getUserFromStringId(request.getUserId()).getFollowedBy());
         Page<User> pageFollowers = new PageImpl<>(followers, PageRequest.of(request.getPageNumber(), request.getNumberPerPage()), followers.size());

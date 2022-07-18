@@ -3,10 +3,13 @@ package com.gitter.socialapi.modules.user.exposition;
 
 import com.gitter.socialapi.auth.AuthService;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
+import com.gitter.socialapi.kernel.exceptions.NoProfilePictureException;
 import com.gitter.socialapi.modules.user.application.UserService;
 import com.gitter.socialapi.modules.user.exposition.payload.request.*;
 import com.gitter.socialapi.modules.user.exposition.payload.response.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.keycloak.adapters.springsecurity.account.SimpleKeycloakAccount;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.keycloak.representations.AccessToken;
@@ -14,8 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.websocket.server.PathParam;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 @RestController
@@ -73,13 +81,8 @@ public class UserController {
         return ResponseEntity.ok(followsResponses);
     }
     @GetMapping("/me")
-    public ResponseEntity<RetrieveUserByIdResponse> retrieveUserFromToken(KeycloakAuthenticationToken authentication) {
-        SimpleKeycloakAccount account = (SimpleKeycloakAccount) authentication.getDetails();
-        AccessToken token = account.getKeycloakSecurityContext().getToken();
-        //Username, other way
-        System.out.println(authentication.getPrincipal().toString());
-
-        return ResponseEntity.ok(null);
+    public ResponseEntity<RetrieveUserByIdResponse> retrieveUserFromToken(KeycloakAuthenticationToken authentication) throws InvalidParameterException {
+        return ResponseEntity.ok(userService.getById(authentication.getPrincipal().toString()));
     }
     
     @GetMapping(
@@ -93,12 +96,29 @@ public class UserController {
           ) {
         return ResponseEntity.ok(userService.searchUser(username, page, size));
     }
+
+    @RequestMapping(value = "/picture/{userId}", method = RequestMethod.POST, consumes = "multipart/form-data")
+    @PreAuthorize("@authService.tokenIsValidForUserWithId(#userId, #authentication)")
+    public ResponseEntity<String> uploadImages(
+            @RequestParam("image")  MultipartFile file, 
+            @PathVariable String userId,
+            KeycloakAuthenticationToken authentication
+            )
+            throws IOException, InvalidParameterException {
+        userService.uploadUserPicture(file.getBytes(), userId, FilenameUtils.getExtension(file.getOriginalFilename()));
+        return ResponseEntity.ok(String.format("Picture for user %s has been successfully updated", userId));
+    }
+    @RequestMapping(value = "/picture/{userId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public @ResponseBody byte[] getPicture(@PathVariable("userId") String userId) throws IOException, InvalidParameterException, NoProfilePictureException {
+        return userService.getUserPicture(userId);
+    }
     @PutMapping
     @PreAuthorize("@authService.tokenIsValidForUserWithId(#updateUserRequest.id, #authentication)")
     public ResponseEntity<String> updateUser(@RequestBody UpdateUserRequest updateUserRequest, KeycloakAuthenticationToken authentication) throws InvalidParameterException {
         userService.updateUser(updateUserRequest);
         return ResponseEntity.ok(String.format("User %s updated", updateUserRequest.getId()));
     }
+    
     @PutMapping("/follow")
     @PreAuthorize("@authService.tokenIsValidForUserWithId(#followUserRequest.userId, #authentication)")
     public ResponseEntity<String> follow(@RequestBody UpdateFollowUserRequest followUserRequest, KeycloakAuthenticationToken authentication) throws InvalidParameterException {
