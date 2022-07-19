@@ -6,7 +6,7 @@ public class InvalidCodeVersionException extends InvalidParameterException {
         super(message);
     }
     
-    public static InvalidParameterException of(String codeId, String versionId) {
+    public static InvalidCodeVersionException of(String codeId, String versionId) {
         return new InvalidCodeVersionException(String.format("No code found with id %s and version %s", codeId, versionId));
     }
     

@@ -14,6 +14,7 @@ import org.keycloak.adapters.springsecurity.account.SimpleKeycloakAccount;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.keycloak.representations.AccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -108,10 +109,13 @@ public class UserController {
         userService.uploadUserPicture(file.getBytes(), userId, FilenameUtils.getExtension(file.getOriginalFilename()));
         return ResponseEntity.ok(String.format("Picture for user %s has been successfully updated", userId));
     }
-    @RequestMapping(value = "/picture/{userId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public @ResponseBody byte[] getPicture(@PathVariable("userId") String userId) throws IOException, InvalidParameterException, NoProfilePictureException {
-        return userService.getUserPicture(userId);
+    @GetMapping(value = "/picture/{userId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<byte[]> getPicture(@PathVariable("userId") String userId) throws IOException, InvalidParameterException, NoProfilePictureException {
+        HttpHeaders responseHeaders = new HttpHeaders();
+        byte[] body = userService.getUserPicture(userId, responseHeaders);
+        return ResponseEntity.ok().headers(responseHeaders).body(body);
     }
+    
     @PutMapping
     @PreAuthorize("@authService.tokenIsValidForUserWithId(#updateUserRequest.id, #authentication)")
     public ResponseEntity<String> updateUser(@RequestBody UpdateUserRequest updateUserRequest, KeycloakAuthenticationToken authentication) throws InvalidParameterException {
