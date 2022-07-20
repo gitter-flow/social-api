@@ -112,8 +112,7 @@ public class CodeAPIRepository {
     }
 
     public String getVersionCode(String fileName, String versionId) throws IOException, InterruptedException, URISyntaxException, InvalidParameterException {
-
-
+        
         URI uri = new URIBuilder(String.format("%s/resources/minio/fileversion?namefile=%s&version_of_file=%s", codeApiURL, fileName, versionId)).build();
         var httpRequest = HttpRequest.newBuilder(uri)
                 .header("Content-Type", "application/json")
@@ -122,9 +121,6 @@ public class CodeAPIRepository {
 
         HttpResponse<String> response = client.send(httpRequest,
                 HttpResponse.BodyHandlers.ofString());
-        System.out.println("-------------------------------");
-        System.out.println(response.body());
-        System.out.println("-------------------------------");
         if(response.statusCode() == 400) {
             throw InvalidCodeVersionException.of(fileName, versionId);
         }else if(response.statusCode() / 100 != 2) {

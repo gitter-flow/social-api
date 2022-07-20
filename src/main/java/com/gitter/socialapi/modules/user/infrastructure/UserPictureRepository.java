@@ -1,10 +1,7 @@
 package com.gitter.socialapi.modules.user.infrastructure;
 
 import com.gitter.socialapi.kernel.minio.BucketClient;
-import io.minio.BucketExistsArgs;
-import io.minio.GetObjectArgs;
-import io.minio.PutObjectArgs;
-import io.minio.UploadObjectArgs;
+import io.minio.*;
 import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.IOUtils;
@@ -64,12 +61,11 @@ public class UserPictureRepository {
     }
     public InputStream getPicture(String target) {
         try {
-            return bucketClient.get().getObject(
+            log.info(String.format("Retrieve file %s", target));
+            return  bucketClient.get().getObject(
                     GetObjectArgs.builder()
                             .bucket(pictureBucketName)
                             .object(target)
-                            .offset(1024L)
-                            .length(4096L)
                             .build());
         } catch (
                 InvalidKeyException |

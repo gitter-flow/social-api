@@ -8,12 +8,12 @@ import com.gitter.socialapi.modules.user.infrastructure.UserPictureRepository;
 import com.gitter.socialapi.modules.user.infrastructure.UserRepository;
 import com.gitter.socialapi.modules.user.exposition.payload.request.RetrieveUserFollowersRequest;
 import com.gitter.socialapi.modules.user.domain.User;
-import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -71,11 +71,13 @@ public class UserService {
         userRepository.save(user);
     }
     
-    public byte[] getUserPicture(String userId) throws IOException, InvalidParameterException, NoProfilePictureException {
+    public byte[] getUserPicture(String userId, HttpHeaders headers) throws IOException, InvalidParameterException, NoProfilePictureException {
         User user = getUserFromStringId(userId);
         if(user.getPictureFileName() == null) throw NoProfilePictureException.forUser(userId);
         InputStream stream = pictureRepository.getPicture(String.format(user.getPictureFileName(), userId));
-        return Base64.getEncoder().encode(IOUtils.toByteArray(stream));
+        String[] splitFilename =user.getPictureFileName().split("\\.");
+        headers.set("File-Extension", splitFilename[splitFilename.length - 1]);
+        return Base64.getEncoder().encode(stream.readAllBytes());
     }
     public List<RetrieveUserFollowersResponse> retrieveUserFollowers(RetrieveUserFollowersRequest request) throws InvalidParameterException {
         List<User> followers = new ArrayList<>(getUserFromStringId(request.getUserId()).getFollowedBy());
