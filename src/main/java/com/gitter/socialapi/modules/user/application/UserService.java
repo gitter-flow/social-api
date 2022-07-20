@@ -75,7 +75,7 @@ public class UserService {
         User user = getUserFromStringId(userId);
         if(user.getPictureFileName() == null) throw NoProfilePictureException.forUser(userId);
         InputStream stream = pictureRepository.getPicture(String.format(user.getPictureFileName(), userId));
-        return Base64.getDecoder().decode(IOUtils.toByteArray(stream));
+        return Base64.getEncoder().encode(IOUtils.toByteArray(stream));
     }
     public List<RetrieveUserFollowersResponse> retrieveUserFollowers(RetrieveUserFollowersRequest request) throws InvalidParameterException {
         List<User> followers = new ArrayList<>(getUserFromStringId(request.getUserId()).getFollowedBy());
