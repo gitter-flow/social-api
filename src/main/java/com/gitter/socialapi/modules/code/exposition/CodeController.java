@@ -56,7 +56,7 @@ public class CodeController {
         return ResponseEntity.ok(code);
     }
     
-    @DeleteMapping("/{id}")
+    @DeleteMapping
     @PreAuthorize("@authService.tokenIsValidForCodeWithId(#deleteCodeRequest.id, #authentication)")
     public ResponseEntity<String> deleteCode(@RequestBody DeleteCodeRequest deleteCodeRequest, KeycloakAuthenticationToken authentication) throws InvalidParameterException {
         codeService.deleteCode(deleteCodeRequest);

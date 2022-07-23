@@ -16,4 +16,8 @@ public interface UserRepository extends JpaRepository<User, String> {
             value = "select u from users u where u.username like :username order by u.createdAt desc"
     )
     List<User> selectWhereUsernameLike(@Param("username") String username, Pageable pageable);
+    
+    User findByUsername(String username);
+    User findByEmail(String email);
+    
 }       

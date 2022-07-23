@@ -1,30 +1,24 @@
 package com.gitter.socialapi.modules.user.exposition;
 
 
-import com.gitter.socialapi.auth.AuthService;
+import com.gitter.socialapi.modules.auth.AuthService;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.kernel.exceptions.NoProfilePictureException;
 import com.gitter.socialapi.modules.user.application.UserService;
 import com.gitter.socialapi.modules.user.exposition.payload.request.*;
 import com.gitter.socialapi.modules.user.exposition.payload.response.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.keycloak.adapters.springsecurity.account.SimpleKeycloakAccount;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
-import org.keycloak.representations.AccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.websocket.server.PathParam;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 @RestController

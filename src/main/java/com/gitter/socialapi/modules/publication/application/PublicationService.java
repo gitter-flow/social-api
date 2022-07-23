@@ -4,15 +4,16 @@ import com.gitter.socialapi.modules.code.application.CodeService;
 import com.gitter.socialapi.modules.code.domain.Code;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.kernel.exceptions.NoSuchEntityException;
+import com.gitter.socialapi.modules.code.exposition.payload.request.DeleteCodeRequest;
 import com.gitter.socialapi.modules.publication.exposition.payload.request.*;
 import com.gitter.socialapi.modules.publication.exposition.payload.response.*;
 import com.gitter.socialapi.modules.publication.domain.Publication;
 import com.gitter.socialapi.modules.publication.infrastructure.PublicationRepository;
 import com.gitter.socialapi.modules.user.application.UserService;
 import com.gitter.socialapi.modules.user.domain.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.Optional;
 
 
 @Service
+@Slf4j
 public class PublicationService {
 
     private final PublicationRepository publicationRepository;
@@ -75,7 +77,7 @@ public class PublicationService {
         return RetrievePublicationMapper.toResponse(publication);
     }
     public List<RetrieveAllPublicationsResponse> getAll(RetrieveAllPublicationsRequest getRequest) {
-        Page<Publication> publicationList = publicationRepository.findAll(PageRequest.of(getRequest.getPageNumber(), getRequest.getNumberPerPage()));
+        List<Publication> publicationList = publicationRepository.findAllOrderByCreatedAt(PageRequest.of(getRequest.getPageNumber(), getRequest.getNumberPerPage()));
         return RetrieveAllPublicationsMapper.toResponse(publicationList); 
     }
     public List<RetrieveUserPublicationsResponse> getUserPublications(RetrieveUserPublicationRequest getRequest) throws InvalidParameterException {
@@ -111,6 +113,16 @@ public class PublicationService {
         publicationRepository.save(publication);
     }
     public void deletePublication(DeletePublicationRequest deleteRequest) throws InvalidParameterException {
+        Publication publication = getPublicationFromIdString(deleteRequest.getId());
+        if(publication.getCode() != null) {
+            String codeId = publication.getCode().getId();
+            publication.setCode(null);
+            publicationRepository.save(publication);
+            log.info(String.format("Deleting code %s...", codeId));
+            codeService.deleteCode(new DeleteCodeRequest(codeId));
+        }
+        
+        log.info(String.format("Deleting publication %s...", deleteRequest.getId()));
         publicationRepository.deleteById(deleteRequest.getId());
     }
 }

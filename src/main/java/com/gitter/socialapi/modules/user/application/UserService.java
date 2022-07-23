@@ -45,6 +45,12 @@ public class UserService {
         return user.get();
     }
     
+    public User serchFromEmailOrUsername(String searchField) {
+        if(searchField.contains("@")) {
+            return userRepository.findByEmail(searchField);
+        }
+        return userRepository.findByUsername(searchField);
+    }
     public CreateUserResponse createUser(CreateUserRequest userRequest){
         User user = CreateUserMapper.getUser(userRequest);
         userRepository.save(user);

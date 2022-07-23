@@ -11,6 +11,7 @@ import com.gitter.socialapi.modules.code.exposition.payload.request.code_api.Run
 import com.gitter.socialapi.modules.code.exposition.payload.response.code_api.RunAndSaveCodeResponse;
 import com.gitter.socialapi.modules.code.exposition.payload.response.code_api.RunCodeAPIResponse;
 import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.protocol.HTTP;
@@ -34,6 +35,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class CodeAPIRepository {
     private final String codeApiURL;
     
@@ -65,7 +67,7 @@ public class CodeAPIRepository {
     
         HttpResponse<String> response = client.send(httpRequest,
                 HttpResponse.BodyHandlers.ofString());
-        
+        log.info(String.format("code-api/resources/exec responded : %s", response.body()));
         if(response.statusCode() / 100 != 2) {
             throw  UnexpectedInternalRequestException.forRequest(uriStr, response.statusCode(), response.body());
         }
@@ -98,6 +100,8 @@ public class CodeAPIRepository {
                 .build();
         HttpResponse<String> response = client.send(httpRequest,
                 HttpResponse.BodyHandlers.ofString());
+        log.info(String.format("code-api/minio/code responded : %s", response.body()));
+
         if(response.statusCode() / 100 != 2) {
             throw  UnexpectedInternalRequestException.forRequest(uriStr, response.statusCode(), response.body());
         }
@@ -121,6 +125,8 @@ public class CodeAPIRepository {
 
         HttpResponse<String> response = client.send(httpRequest,
                 HttpResponse.BodyHandlers.ofString());
+        log.info(String.format("/resources/minio/fileversion?namefile responded : %s", response.body()));
+
         if(response.statusCode() == 400) {
             throw InvalidCodeVersionException.of(fileName, versionId);
         }else if(response.statusCode() / 100 != 2) {
