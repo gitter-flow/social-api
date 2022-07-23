@@ -37,4 +37,12 @@ public interface PublicationRepository extends JpaRepository<Publication, String
     )
     void deleteById(@Param("id") @NonNull String id);
     
+    @Query(
+            value = """
+                select p from publication p
+                order by p.createdAt desc
+                """
+    )
+    List<Publication> findAllOrderByCreatedAt(Pageable pageable);
+    
 }

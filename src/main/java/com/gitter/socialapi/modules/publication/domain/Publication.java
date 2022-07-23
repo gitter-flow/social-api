@@ -23,7 +23,7 @@ public class Publication {
     @Id
     @Column(name = "id", nullable = false)
     private String id = UUID.randomUUID().toString();
-
+    
     @ManyToOne
     @JoinColumn(name="user_id", nullable = false)
     private User user;
@@ -33,17 +33,16 @@ public class Publication {
     @Column(name = "disabled")
     private Boolean disabled = false;
 
-    @OneToOne(mappedBy = "publication", cascade = CascadeType.ALL,
-            fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "publication", cascade = {CascadeType.REMOVE}, orphanRemoval = true)
     @JoinColumn(name = "code_id")
     private Code code;
-
+    
     @ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.ALL, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST })
     @JoinColumn(name= "shared_publication", foreignKey = @javax.persistence.ForeignKey(name = "none"))
     private Publication sharedPublication;
 
     @ManyToOne(fetch = FetchType.LAZY,  cascade = { CascadeType.ALL, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST })
-    @JoinColumn(name= "parent_publication", foreignKey = @javax.persistence.ForeignKey(name = "none"))
+    @JoinColumn(name= "parent_publication", foreignKey = @javax.persistence.ForeignKey(name = "none"), nullable = true)
     private Publication parentPublication;
     
     @ManyToMany(fetch = FetchType.LAZY)

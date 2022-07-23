@@ -6,10 +6,15 @@ import com.gitter.socialapi.modules.team.exposition.payload.request.*;
 import com.gitter.socialapi.modules.team.exposition.payload.response.*;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping(
@@ -20,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 public class TeamController {
     private final TeamService teamService;
     
+    
+    
     @Autowired
     public TeamController(TeamService teamService) {
         this.teamService = teamService;
@@ -27,9 +34,9 @@ public class TeamController {
     
     @PostMapping
     @PreAuthorize("@authService.tokenIsValidForUserWithId(#createRequest.userId, #authentication)")
-    public ResponseEntity<CreateTeamResponse> createTeam(@RequestBody CreateTeamRequest createRequest, KeycloakAuthenticationToken authentication) throws InvalidParameterException {
+    public @ResponseBody CreateTeamResponse createTeam(@RequestBody CreateTeamRequest createRequest, KeycloakAuthenticationToken authentication) throws InvalidParameterException, URISyntaxException {
         CreateTeamResponse response = teamService.createTeam(createRequest);
-        return ResponseEntity.ok(response);
+        return response;
     }
     @GetMapping("/{id}")
     public ResponseEntity<RetrieveTeamResponse> getTeamById(@PathVariable String id) throws InvalidParameterException {

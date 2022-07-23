@@ -18,6 +18,7 @@ import com.gitter.socialapi.kernel.exceptions.InvalidCodeTypeException;
 import com.gitter.socialapi.kernel.exceptions.NoSuchEntityException;
 import com.gitter.socialapi.modules.publication.domain.Publication;
 import com.gitter.socialapi.modules.publication.infrastructure.PublicationRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 
 
 @Service
+@Slf4j
 public class CodeService {
     private final CodeRepository codeRepository;
     private final PublicationRepository publicationRepository;
@@ -79,7 +81,7 @@ public class CodeService {
                         new RunAndSaveCodeRequest.Data(codeRequest.getCode(), code.getCodeType().getText())
                 )
         );
-        code.getVersions().add(
+        code.getVersions().add( 
                 new Version(apiResponse.getMinioCode().getVersionId(), apiResponse.getMinioResultCode().getVersionId()));
 
         codeRepository.save(code);
