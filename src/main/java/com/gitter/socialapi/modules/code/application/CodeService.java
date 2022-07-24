@@ -23,8 +23,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -40,6 +45,9 @@ public class CodeService {
     private final CodeAPIRepository codeAPIRepository;
     
     private final String baseURL;
+    
+    @PersistenceContext
+    private EntityManager entityManager;
     
     private final static String BUCKET_FILENAME_FORMAT="user-%s/code-%s.%s";
     @Autowired
@@ -95,7 +103,8 @@ public class CodeService {
     public RetrieveCodeResponse getCodeFromId(String id) throws InvalidParameterException, IOException, URISyntaxException, InterruptedException {
         Code code = getCodeFromIdString(id);
         RetrieveCodeMapper mapper = new RetrieveCodeMapper(baseURL);
-        String lastCode = getCodeVersion(code.getId(), code.getVersions().get(0).getCodeVersion());
+        List<Version> codeVersions =  code.getVersions();
+        String lastCode = getCodeVersion(code.getId(),codeVersions.get(codeVersions.size() - 1).getCodeVersion());
         return mapper.getResponse(code, lastCode);
     }
     
@@ -109,8 +118,12 @@ public class CodeService {
         String fileName = String.format(BUCKET_FILENAME_FORMAT, code.getPublication().getUser().getId(), code.getPublication().getCode().getId(), CodeType.extension(code.getCodeType()));
         return codeAPIRepository.getVersionCode(fileName, versionId);
     }
+    
+    @Transactional
     public void deleteCode(DeleteCodeRequest deleteCodeRequest) throws InvalidParameterException {
         Code code = getCodeFromIdString(deleteCodeRequest.getId());
+        String request = String.format("DELETE FROM versions WHERE code_id = '%s'", code.getId());
+        entityManager.createNativeQuery(request).executeUpdate();
         codeRepository.delete(code);
     }
 }
