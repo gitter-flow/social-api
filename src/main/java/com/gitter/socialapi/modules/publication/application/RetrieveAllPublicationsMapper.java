@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class RetrieveAllPublicationsMapper {
-    public static List<RetrieveAllPublicationsResponse> toResponse(Page<Publication> publications) {
-        return publications.get().map(
+    public static List<RetrieveAllPublicationsResponse> toResponse(List<Publication> publications) {
+        return publications.stream().map(
                         p -> new RetrieveAllPublicationsResponse(
                                 p.getId(),
                                 p.getUser().getUsername(),

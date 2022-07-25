@@ -18,12 +18,18 @@ import com.gitter.socialapi.kernel.exceptions.InvalidCodeTypeException;
 import com.gitter.socialapi.kernel.exceptions.NoSuchEntityException;
 import com.gitter.socialapi.modules.publication.domain.Publication;
 import com.gitter.socialapi.modules.publication.infrastructure.PublicationRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,6 +37,7 @@ import java.util.stream.Collectors;
 
 
 @Service
+@Slf4j
 public class CodeService {
     private final CodeRepository codeRepository;
     private final PublicationRepository publicationRepository;
@@ -38,6 +45,9 @@ public class CodeService {
     private final CodeAPIRepository codeAPIRepository;
     
     private final String baseURL;
+    
+    @PersistenceContext
+    private EntityManager entityManager;
     
     private final static String BUCKET_FILENAME_FORMAT="user-%s/code-%s.%s";
     @Autowired
@@ -79,7 +89,7 @@ public class CodeService {
                         new RunAndSaveCodeRequest.Data(codeRequest.getCode(), code.getCodeType().getText())
                 )
         );
-        code.getVersions().add(
+        code.getVersions().add( 
                 new Version(apiResponse.getMinioCode().getVersionId(), apiResponse.getMinioResultCode().getVersionId()));
 
         codeRepository.save(code);
@@ -93,7 +103,8 @@ public class CodeService {
     public RetrieveCodeResponse getCodeFromId(String id) throws InvalidParameterException, IOException, URISyntaxException, InterruptedException {
         Code code = getCodeFromIdString(id);
         RetrieveCodeMapper mapper = new RetrieveCodeMapper(baseURL);
-        String lastCode = getCodeVersion(code.getId(), code.getVersions().get(0).getCodeVersion());
+        List<Version> codeVersions =  code.getVersions();
+        String lastCode = getCodeVersion(code.getId(),codeVersions.get(codeVersions.size() - 1).getCodeVersion());
         return mapper.getResponse(code, lastCode);
     }
     
@@ -107,8 +118,12 @@ public class CodeService {
         String fileName = String.format(BUCKET_FILENAME_FORMAT, code.getPublication().getUser().getId(), code.getPublication().getCode().getId(), CodeType.extension(code.getCodeType()));
         return codeAPIRepository.getVersionCode(fileName, versionId);
     }
+    
+    @Transactional
     public void deleteCode(DeleteCodeRequest deleteCodeRequest) throws InvalidParameterException {
         Code code = getCodeFromIdString(deleteCodeRequest.getId());
+        String request = String.format("DELETE FROM versions WHERE code_id = '%s'", code.getId());
+        entityManager.createNativeQuery(request).executeUpdate();
         codeRepository.delete(code);
     }
 }

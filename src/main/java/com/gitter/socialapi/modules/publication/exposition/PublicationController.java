@@ -1,10 +1,11 @@
 package com.gitter.socialapi.modules.publication.exposition;
 
-import com.gitter.socialapi.auth.AuthService;
+import com.gitter.socialapi.modules.auth.AuthService;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.modules.publication.application.PublicationService;
 import com.gitter.socialapi.modules.publication.exposition.payload.request.*;
 import com.gitter.socialapi.modules.publication.exposition.payload.response.*;
+import lombok.extern.slf4j.Slf4j;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@Slf4j
 @RequestMapping(
         value = "/publication",
         consumes = MediaType.APPLICATION_JSON_VALUE,
