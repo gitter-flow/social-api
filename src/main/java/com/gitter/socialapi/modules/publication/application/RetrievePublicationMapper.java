@@ -16,6 +16,7 @@ public class RetrievePublicationMapper {
                 publication.getCode() != null? publication.getCode() .getId() : null,
                 publication.getSharedPublication() != null ? publication.getSharedPublication().getId() : null,
                 publication.getParentPublication() != null ? publication.getParentPublication().getId() : null,
+                publication.getParentPublication() != null ? publication.getParentPublication().getUser().getUsername() : null,
                 publication.getLikedBy().stream()
                         .map(User::getId)
                         .collect(Collectors.toList())
