@@ -15,27 +15,13 @@ import java.util.List;
 
 @Configuration
 public class ApplicationConfig {
-    @Value("${application.url}") 
+    @Value("${app.front-url}") 
     private String baseURL;
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
         return modelMapper;
     }
-//    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() {
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        CorsConfiguration config = new CorsConfiguration();
-//
-//        config.setAllowCredentials(true);
-//        config.setAllowedOrigins(List.of("https://gitter.uk"));
-//        config.setAllowedMethods(List.of(CorsConfiguration.ALL));
-//        config.setAllowedHeaders(List.of(CorsConfiguration.ALL));
-//        config.setAllowCredentials(true);
-//        source.registerCorsConfiguration("/**", config);
-//
-//        return source;
-//    }
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
