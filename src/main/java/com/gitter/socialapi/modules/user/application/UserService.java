@@ -8,6 +8,7 @@ import com.gitter.socialapi.modules.user.infrastructure.UserPictureRepository;
 import com.gitter.socialapi.modules.user.infrastructure.UserRepository;
 import com.gitter.socialapi.modules.user.exposition.payload.request.RetrieveUserFollowersRequest;
 import com.gitter.socialapi.modules.user.domain.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 
 
 @Service
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
@@ -42,7 +44,6 @@ public class UserService {
         this.pictureRepository = pictureRepository;
         this.baseURL = baseURL;
     }
-
     public User getUserFromStringId(String id) throws InvalidParameterException {
         Optional<User> user = userRepository.findById(id);
         if(user.isEmpty()){
@@ -62,13 +63,10 @@ public class UserService {
         userRepository.save(user);
         return CreateUserResponse.of(user);
     }
-
     public RetrieveUserByIdResponse getById(String id) throws InvalidParameterException {
         User user = getUserFromStringId(id);
         return RetrieveUserMapper.toGetUserByIdResponse(user);
     }
-
-    
     public List<SearchUserResponse> searchUser(String username, int pageNumber, int numberPerPage) {
         PageRequest page = PageRequest.of(pageNumber, numberPerPage);
         List<User> userList = userRepository.selectWhereUsernameLike(username, page);
@@ -115,7 +113,7 @@ public class UserService {
         User user = UpdateUserMapper.getUser(userRequest, getUserFromStringId(userRequest.getId()));
         userRepository.save(user);
     }
-    
+
     public void follow(UpdateFollowUserRequest updateFollowUserRequest) throws InvalidParameterException {
         User user = getUserFromStringId(updateFollowUserRequest.getUserId());
         if(user.getFollows().stream().map(u -> Objects.equals(u.getId(), updateFollowUserRequest.getUserToFollowId())).findAny().isEmpty()) return;
@@ -125,17 +123,12 @@ public class UserService {
     }
     
     @Transactional
-    public void unfollow(UpdateUnfollowUserRequest updateUnfollowUserRequest) throws InvalidParameterException {
-        User user = getUserFromStringId(updateUnfollowUserRequest.getUserId());
-//        value = "delete from user_follows u where u.id_followed = :userId and u.id_user = :userToUnfollowId"
-        String request = String.format("DELETE FROM user_follows AS u WHERE u.id_followed='%s' and u.id_user='%s'", updateUnfollowUserRequest.getUserId(), updateUnfollowUserRequest.getUserToUnfollowId());
-        entityManager.createNativeQuery(request).executeUpdate();
-//        List<User> newFollows = user.getFollows().stream()
-//                .filter(u -> !Objects.equals(u.getId(), updateUnfollowUserRequest.getUserToUnfollowId()))
-//                .collect(Collectors.toList());
-//        user.setFollows(newFollows);
-//        userRepository.save(user);
+    public void unfollow(UpdateUnfollowUserRequest updateUnfollowUserRequest) {
+        log.info("Unfollowing user...");
+        String request = "DELETE FROM user_follows AS u WHERE u.id_followed=':followed' AND u.id_user=:id_user";
+        entityManager.createNativeQuery(request)
+                .setParameter("followed", updateUnfollowUserRequest.getUserToUnfollowId())
+                .setParameter("id_user", updateUnfollowUserRequest.getUserId())
+                .executeUpdate();
     }
-
-    
 }

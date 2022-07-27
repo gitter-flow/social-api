@@ -130,7 +130,7 @@ public class UserController {
 
     @PutMapping("/unfollow")
     @PreAuthorize("@authService.tokenIsValidForUserWithId(#unfollowUserRequest.userId, #authentication)")
-    public ResponseEntity<String> unfollow(@RequestBody UpdateUnfollowUserRequest unfollowUserRequest, KeycloakAuthenticationToken authentication) throws InvalidParameterException {
+    public ResponseEntity<String> unfollow(@RequestBody UpdateUnfollowUserRequest unfollowUserRequest, KeycloakAuthenticationToken authentication) {
         userService.unfollow(unfollowUserRequest);
         return ResponseEntity.ok(String.format(
                 "User %s unfollows user %s",

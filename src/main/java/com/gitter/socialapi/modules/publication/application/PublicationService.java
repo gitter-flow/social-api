@@ -114,13 +114,8 @@ public class PublicationService {
     }
     public void deletePublication(DeletePublicationRequest deleteRequest) throws InvalidParameterException {
         Publication publication = getPublicationFromIdString(deleteRequest.getId());
-        System.out.println("HHHHHHHHHHHHHHHHHHHHHHH");
         if(publication.getCode() != null) {
-            System.out.println("--------------------------------");
-            System.out.println("IDD: " + publication.getCode().getId());
             String codeId = publication.getCode().getId();
-//            publication.setCode(new Code());
-//            publicationRepository.save(publication);
             log.info(String.format("Deleting code %s...", codeId));
             codeService.deleteCode(new DeleteCodeRequest(codeId));
         }

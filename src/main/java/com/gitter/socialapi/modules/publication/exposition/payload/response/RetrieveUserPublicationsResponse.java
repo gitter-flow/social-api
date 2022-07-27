@@ -16,5 +16,6 @@ public class RetrieveUserPublicationsResponse {
     private String codeId;
     private String sharedPublicationId;
     private String parentPublicationId;
+    private String parentPublicationUsername;
     private List<String> likes;
 }
