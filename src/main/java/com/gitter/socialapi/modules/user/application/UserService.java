@@ -16,6 +16,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -29,6 +32,9 @@ public class UserService {
     
     private final UserPictureRepository pictureRepository;
     private final String baseURL;
+
+    @PersistenceContext
+    private EntityManager entityManager;
     
     @Autowired
     public UserService(UserRepository userRepository, UserPictureRepository pictureRepository, @Value("${application.url}") String baseURL) {
@@ -112,18 +118,23 @@ public class UserService {
     
     public void follow(UpdateFollowUserRequest updateFollowUserRequest) throws InvalidParameterException {
         User user = getUserFromStringId(updateFollowUserRequest.getUserId());
+        if(user.getFollows().stream().map(u -> Objects.equals(u.getId(), updateFollowUserRequest.getUserToFollowId())).findAny().isEmpty()) return;
         User userToFollow = getUserFromStringId(updateFollowUserRequest.getUserToFollowId());
         user.getFollows().add(0, userToFollow);
         userRepository.save(user);
     }
+    
+    @Transactional
     public void unfollow(UpdateUnfollowUserRequest updateUnfollowUserRequest) throws InvalidParameterException {
         User user = getUserFromStringId(updateUnfollowUserRequest.getUserId());
-
-        List<User> newFollows = user.getFollows().stream()
-                .filter(u -> !Objects.equals(u.getId(), updateUnfollowUserRequest.getUserToUnfollowId()))
-                .collect(Collectors.toList());
-        user.setFollows(newFollows);
-        userRepository.save(user);
+//        value = "delete from user_follows u where u.id_followed = :userId and u.id_user = :userToUnfollowId"
+        String request = String.format("DELETE FROM user_follows AS u WHERE u.id_followed='%s' and u.id_user='%s'", updateUnfollowUserRequest.getUserId(), updateUnfollowUserRequest.getUserToUnfollowId());
+        entityManager.createNativeQuery(request).executeUpdate();
+//        List<User> newFollows = user.getFollows().stream()
+//                .filter(u -> !Objects.equals(u.getId(), updateUnfollowUserRequest.getUserToUnfollowId()))
+//                .collect(Collectors.toList());
+//        user.setFollows(newFollows);
+//        userRepository.save(user);
     }
 
     
