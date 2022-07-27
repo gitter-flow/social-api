@@ -1,4 +1,4 @@
-package com.gitter.socialapi.modules.auth;
+package com.gitter.socialapi.modules.auth.service;
 
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.modules.code.application.CodeService;

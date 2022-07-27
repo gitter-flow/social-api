@@ -1,7 +1,7 @@
 package com.gitter.socialapi.modules.user.exposition;
 
 
-import com.gitter.socialapi.modules.auth.AuthService;
+import com.gitter.socialapi.modules.auth.service.AuthService;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.kernel.exceptions.NoProfilePictureException;
 import com.gitter.socialapi.modules.user.application.UserService;

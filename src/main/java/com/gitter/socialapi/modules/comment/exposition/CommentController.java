@@ -1,6 +1,6 @@
 package com.gitter.socialapi.modules.comment.exposition;
 
-import com.gitter.socialapi.modules.auth.AuthService;
+import com.gitter.socialapi.modules.auth.service.AuthService;
 import com.gitter.socialapi.modules.comment.application.CommentService;
 import com.gitter.socialapi.modules.comment.exposition.payload.request.*;
 import com.gitter.socialapi.modules.comment.exposition.payload.response.CreateCommentResponse;
