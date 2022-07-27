@@ -1,6 +1,6 @@
 package com.gitter.socialapi.modules.publication.exposition;
 
-import com.gitter.socialapi.modules.auth.AuthService;
+import com.gitter.socialapi.modules.auth.service.AuthService;
 import com.gitter.socialapi.kernel.exceptions.InvalidParameterException;
 import com.gitter.socialapi.modules.publication.application.PublicationService;
 import com.gitter.socialapi.modules.publication.exposition.payload.request.*;
